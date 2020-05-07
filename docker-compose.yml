@@ -1,5 +1,6 @@
 version: '3.5'
 services:
+
   nhsd.buyingcatalogue.ordering.api.ordering.db:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api-ordering-db:${TAG:-latest}
     build: 
@@ -16,7 +17,7 @@ services:
       - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueOrdering}
       - NHSD_PASSWORD=DisruptTheMarket1!
     ports:
-      - "${NHSD_LOCAL_DB_PORT:-1533}:1433"
+      - "${NHSD_LOCAL_DB_PORT:-1534}:1433"
 
   nhsd.buyingcatalogue.ordering.api:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
@@ -25,12 +26,67 @@ services:
       context: .
       dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
     environment:
+      - ALLOWINVALIDCERTIFICATE=True
       - ASPNETCORE_ENVIRONMENT=Development
+      - AUTHORITY=http://host.docker.internal:8070/identity
       - CONNECTIONSTRINGS__ORDERINGDB=Data Source=nhsd.buyingcatalogue.ordering.api.ordering.db;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD;Password=DisruptTheMarket1!
+    depends_on:
+      - nhsd.buyingcatalogue.ordering.api.ordering.db
     networks:
       - nhsd_bcnetwork
     ports:
       - "8076:80"
+
+  nhsd.buyingcatalogue.identity.api.user.db:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/identity-api-user-db:${TAG:-latest}
+    container_name: ordering_identity_api_user_db
+    volumes:
+      - nhsd_identity_user_db_volume:/var/opt/mssql/
+    networks:
+      - nhsd_bcnetwork
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=MyTestPassword123!
+      - MSSQL_PID=Express
+      - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueUsers}
+      - NHSD_PASSWORD=DisruptTheMarket1!
+      - INSERT_TEST_DATA=True
+      - CREATE_EA_USER=True
+      - EA_USER_FIRST_NAME=Agency
+      - EA_USER_LAST_NAME=User
+      - EA_USER_EMAIL=user@agency.com
+      - EA_USER_PASSWORD_HASH=AQAAAAEAACcQAAAAEEOFkNNrFpKmDC2TBv2CP/dzxfnjdXk97RoqRlunE/CGs2tmFcewKZj4M/fITiP2tg==
+      - EA_USER_PHONE=01234567890
+    ports:
+      - "${NHSD_LOCAL_DB_PORT:-1533}:1433"
+
+  nhsd.buyingcatalogue.identity.api:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/identity-isapi:${TAG:-latest}
+    container_name: ordering_identity_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CLIENTS__1__REDIRECTURLS__0=http://localhost:8072/signin-oidc
+      - CLIENTS__1__REDIRECTURLS__1=http://host.docker.internal:8072/signin-oidc
+      - CLIENTS__1__POSTLOGOUTREDIRECTURLS__0=http://localhost:8072/signout-callback-oidc
+      - CLIENTS__1__POSTLOGOUTREDIRECTURLS__1=http://host.docker.internal:8072/signout-callback-oidc
+      - ConnectionStrings__CatalogueUsers=${NHSD_CATALOGUEUSERS_DB:-Data Source=nhsd.buyingcatalogue.identity.api.user.db;Initial Catalog=CatalogueUsers;MultipleActiveResultSets=True;User Id=NHSD;Password=DisruptTheMarket1!}
+      - ISSUERURL=http://host.docker.internal:8070/identity
+      - SmtpServer__Host=nhsd.buyingcatalogue.email
+      - SmtpServer__Port=587
+      - SmtpServer__emailSubjectPrefix=INTEGRATION_TEST
+      - AllowInvalidCertificate=True   
+      - PUBLICBROWSE__BASEADDRESS=http://localhost:8076/publicbrowse
+      - PUBLICBROWSE__LOGINPATH=/re-login
+    depends_on:
+      - nhsd.buyingcatalogue.identity.api.user.db
+    entrypoint: 
+      - /bin/sh
+      - -c 
+      - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && dotnet /app/NHSD.BuyingCatalogue.Identity.Api.dll
+    networks:
+      - nhsd_bcnetwork
+    ports:
+      - "8070:80"
 
 networks: 
   nhsd_bcnetwork:
@@ -40,4 +96,5 @@ networks:
 volumes:
   nhsd_ordering_db_volume:
     name: nhsd_ordering_db_volume
-
+  nhsd_identity_user_db_volume:
+    name: nhsd_ordering_identity_user_db_volume

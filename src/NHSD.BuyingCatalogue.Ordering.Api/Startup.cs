@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -33,6 +36,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = Configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
 
+            services.AddDbContext<ApplicationDbContext>(options =>
+	            options.UseSqlServer(connectionString));
+
             services.RegisterHealthChecks(connectionString);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -52,7 +58,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     }
                 });
 
-            services.AddControllers();
+            services.AddControllers()
+	            .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.AddAuthorization(options =>
             {
@@ -72,23 +79,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public  void Configure(IApplicationBuilder app)
+        public  void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
             app.UseSerilogRequestLogging(opts =>
             {
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
 
-
             if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -104,6 +108,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready)
                 });
             });
+
+            foreach (IConfigurationSection configurationSection in Configuration.GetChildren())
+            {
+	            logger.LogInformation($"{configurationSection.Key} = {configurationSection.Value}");
+            }
         }
     }
 }
