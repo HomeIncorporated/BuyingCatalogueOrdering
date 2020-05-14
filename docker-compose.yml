@@ -37,6 +37,7 @@ networks:
   nhsd_bcnetwork:
     name: nhsd_bcnetwork
     driver: bridge
+    external: true
 
 volumes:
   nhsd_ordering_db_volume:

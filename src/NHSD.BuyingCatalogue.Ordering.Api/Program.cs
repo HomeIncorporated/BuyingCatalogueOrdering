@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
+using Serilog.Sinks.SystemConsole.Themes;
 
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -12,18 +13,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
     {
         public static int Main(string[] args)
         {
+            IdentityModelEventSource.ShowPII = true;
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
                 .Enrich.FromLogContext()
 
 #if DEBUG
                 .WriteTo.Debug()
-                .WriteTo.Console(new RenderedCompactJsonFormatter())
-#else
-                .WriteTo.Console(new CompactJsonFormatter())
 #endif
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
 
             try

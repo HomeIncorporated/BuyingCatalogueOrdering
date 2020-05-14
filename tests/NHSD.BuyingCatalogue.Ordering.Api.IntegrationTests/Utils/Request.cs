@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using TechTalk.SpecFlow;
@@ -31,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
         {
             return url
                 .AppendPathSegments(pathSegments)
-                .WithOAuthBearerToken(_context.Get(ScenarioContextKeys.AccessToken, string.Empty))
+                .WithOAuthBearerToken(IdentityTestServer.Token)
                 .AllowAnyHttpStatus();
         }
     }
