@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    [AllowAnonymous]
+    [Authorize(PolicyName.CanAccessOrders)]
     public sealed class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
@@ -25,12 +26,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
+        [AuthenticateOrganisation]
         [Route("/api/v1/organisations/{organisationId}/[controller]")]
         public async Task<ActionResult> GetAllAsync(Guid organisationId)
         {
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
 
-            var orderModelResult = orders.Select(order => new OrderModel()
+            var orderModelResult = orders.Select(order => new OrderModel
             {
                 OrderId = order.OrderId,
                 Description = order.Description,
@@ -112,13 +114,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CreateOrderResponseModel> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public ActionResult<CreateOrderResponseModel> CreateOrderAsync(CreateOrderModel order)
         {
             if (order is null)
             {
                 throw new ArgumentNullException(nameof(order));
             }
-            var createOrderResponse = new CreateOrderResponseModel {OrderId = "C0000014-01" };
+            var createOrderResponse = new CreateOrderResponseModel { OrderId = "C0000014-01" };
             return Ok(createOrderResponse);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -36,6 +38,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
 
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IAuthorizationHandler, OrderAuthorizationHandler>();
             services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
