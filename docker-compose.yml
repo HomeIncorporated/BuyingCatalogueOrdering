@@ -26,6 +26,8 @@ services:
       context: .
       dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
     environment:
+      - ALLOWINVALIDCERTIFICATE=True
+      - AUTHORITY=http://host.docker.internal:8090/identity
       - ASPNETCORE_ENVIRONMENT=Development
       - CONNECTIONSTRINGS__ORDERINGDB=Data Source=nhsd.buyingcatalogue.ordering.api.ordering.db;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD;Password=DisruptTheMarket1!
     networks:

@@ -25,22 +25,22 @@ Scenario: 2. Get all of the orders from an invalid organisationId
 	Then a response with status code 200 is returned
 	And an empty list is returned
 
-@ignore
-@4826
-Scenario: 3. If a user is not authorised then they cannot access the orders
-	#This will not have the logging in
-	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
-	Then a response with status code 401 is returned
-
-@ignore
-@4826
-Scenario: 4. A non authority user cannot access the orders
-	#This will have a non authority user logged in
-	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
-	Then a response with status code 403 is returned
-
-@4826
-Scenario: 5. Service Failure
-	Given the call to the database will fail
-	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
-	Then a response with status code 500 is returned
+#@ignore
+#@4826
+#Scenario: 3. If a user is not authorised then they cannot access the orders
+#	#This will not have the logging in
+#	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
+#	Then a response with status code 401 is returned
+#
+#@ignore
+#@4826
+#Scenario: 4. A non authority user cannot access the orders
+#	#This will have a non authority user logged in
+#	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
+#	Then a response with status code 403 is returned
+#
+#@4826
+#Scenario: 5. Service Failure
+#	Given the call to the database will fail
+#	When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
+#	Then a response with status code 500 is returned

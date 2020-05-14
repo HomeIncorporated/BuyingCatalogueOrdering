@@ -53,13 +53,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                         IssuerSigningKeyValidator = (key, token, parameters) => true,
                         ValidateIssuerSigningKey = false,
                         ValidateIssuer = false,
-                        AudienceValidator = (audiences, token, parameters) => true,
-                        RequireExpirationTime = false,
-                        TokenReplayValidator = (time, token, parameters) => true,
-                        ValidateAudience = false,
-                        ValidateActor = false,
-                        ValidateLifetime = false,
-                        ValidateTokenReplay = false
+                        //AudienceValidator = (audiences, token, parameters) => true,
+                        //RequireExpirationTime = false,
+                        //TokenReplayValidator = (time, token, parameters) => true,
+                        //ValidateAudience = false,
+                        //ValidateActor = false,
+                        //ValidateLifetime = false,
+                        //ValidateTokenReplay = false
                     };
 
                     if (allowInvalidCertificate)

@@ -17,8 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
                 .Enrich.FromLogContext()
 
 #if DEBUG

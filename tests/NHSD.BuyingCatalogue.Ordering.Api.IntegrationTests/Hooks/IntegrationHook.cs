@@ -51,12 +51,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
             using HttpClient client = new HttpClient();
 
             //var discoveryAddress = client.BaseAddress.ToString();
-            var discoveryAddress = "http://localhost:5102/identity";
+            var discoveryAddress = "http://localhost:8090/identity";
 
             var discoveryDocument =
                 await client.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
                 {
-                    Policy = new DiscoveryPolicy { RequireHttps = false },
+                    Policy = new DiscoveryPolicy
+                    {
+                        RequireHttps = false,
+                        ValidateIssuerName = false
+                    },
                     Address = discoveryAddress,
                 });
 
@@ -82,7 +86,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
                 return;
             }
 
-            IdentityTestServer.Token = tokenResponse.AccessToken;
+            string accessToken = tokenResponse.AccessToken;
+
+            Console.WriteLine($"Access Token : {accessToken}");
+            IdentityTestServer.Token = accessToken;
         }
 
         private async Task StopMockIdentityServerAsync()

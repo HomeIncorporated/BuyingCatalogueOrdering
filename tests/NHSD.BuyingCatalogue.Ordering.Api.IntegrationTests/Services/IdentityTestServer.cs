@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Services
                             .AddEnvironmentVariables();
                     });
 
-                    webHost.UseUrls("http://localhost:5102");
+                    webHost.UseUrls("http://localhost:8090");
                     webHost.UseKestrel();
                     webHost.UseStartup<IdentityStartUp>();
                 });
@@ -55,7 +55,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Services
 
             public void ConfigureServices(IServiceCollection services)
             {
-                services.AddIdentityServer()
+                services.AddIdentityServer(options =>
+                    {
+                        options.IssuerUri = "http://localhost:8090/identity";
+                    })
                     .AddInMemoryClients(Clients.Get())
                     .AddInMemoryIdentityResources(Resources.GetIdentityResources())
                     .AddInMemoryApiResources(Resources.GetApiResources())
