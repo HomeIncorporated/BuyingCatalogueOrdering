@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 		[When(@"the user executes the get all orders request")]
 		public async Task WhenTheUserExecutesTheGetAllOrdersRequest()
 		{
-			var discoveryAddress = "http://host.docker.internal:8070/identity";
+			var discoveryAddress = "http://localhost:8070/identity";
 
 			using var client = new HttpClient();
 
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
 			string accessToken = tokenResponse.AccessToken;
 
-			var result = await "http://host.docker.internal:8076/api/v1/orders"
+			var result = await "http://localhost:8076/api/v1/orders"
 				.WithOAuthBearerToken(accessToken)
 				.AllowAnyHttpStatus()
 				.GetAsync();
