@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -11,34 +15,84 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces("application/json")]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    public sealed class OrdersController : ControllerBase
+    public sealed class OrdersController : Controller
     {
         [HttpGet]
-        public ActionResult GetOrders()
+        [Route("{orderId}/summary")]
+        public async Task<ActionResult> GetOrderSummaryAsync(string orderId)
         {
-            var orders = new List<OrdersModel>
-            {
-                new OrdersModel
-                {
-                    OrderId = "C0000014-01",
-                    OrderDescription = "Some Order",
-                    LastUpdatedBy = "Bob Smith",
-                    LastUpdated = DateTime.UtcNow,
-                    DateCreated = DateTime.UtcNow,
-                    Status = "Unsubmitted"
-                },
-                new OrdersModel
-                {
-                    OrderId = "C000012-01",
-                    OrderDescription = "Some new order",
-                    LastUpdatedBy = "Alice Smith",
-                    LastUpdated = DateTime.UtcNow,
-                    DateCreated = DateTime.UtcNow,
-                    Status = "Submitted"
-                }
-            };
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
-            return Ok(orders);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new OrderSummaryModel
+            {
+                OrderId = orderId,
+                OrganisationId = order.OrganisationId,
+                Description = order.Description,
+                Sections = new List<SectionModel>
+                {
+                    new SectionModel
+                    {
+                        Id = "ordering-description",
+                        Status = string.IsNullOrWhiteSpace(order.Description) ? "incomplete" : "complete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "ordering-party",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                {
+                        Id = "supplier",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "commencement-date",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "associated-services",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "service-recipients",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "catalogue-solutions",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "additional-services",
+                        Status = "incomplete"
+                    },
+                    new SectionModel
+                    {
+                        Id = "funding-source",
+                        Status = "incomplete"
+                    }
+                }
+            });
+                }
+
+        [HttpPost]
+        public ActionResult<CreateOrderResponseModel> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        {
+            if (order is null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+            var createOrderResponse = new CreateOrderResponseModel {OrderId = "C0000014-01" };
+            return Ok(createOrderResponse);
         }
     }
 }

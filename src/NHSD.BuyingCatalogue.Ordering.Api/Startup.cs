@@ -7,11 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using NHSD.BuyingCatalogue.Ordering.Api.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Repositories;
 using Serilog;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -20,24 +21,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
     {
         private readonly IWebHostEnvironment _environment;
 
+        private readonly IConfiguration _configuration;
+
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
             _environment = environment;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("OrderingDb");
-            var authority = Configuration.GetValue<string>("authority");
-            var requireHttps = Configuration.GetValue<bool>("RequireHttps");
-            var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
+            var connectionString = _configuration.GetConnectionString("OrderingDb");
+            var authority = _configuration.GetValue<string>("Authority");
+            var requireHttps = _configuration.GetValue<bool>("RequireHttps");
+            var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-	            options.UseSqlServer(connectionString));
+            services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
 
@@ -59,7 +58,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 });
 
             services.AddControllers()
-	            .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             services.AddAuthorization(options =>
             {
@@ -77,9 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             });
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public  void Configure(IApplicationBuilder app, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseSerilogRequestLogging(opts =>
             {
@@ -92,7 +92,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             }
 
             app.UseRouting();
+
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -108,11 +110,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready)
                 });
             });
-
-            foreach (IConfigurationSection configurationSection in Configuration.GetChildren())
-            {
-	            logger.LogInformation($"{configurationSection.Key} = {configurationSection.Value}");
-            }
         }
     }
 }
