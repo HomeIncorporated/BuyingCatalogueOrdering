@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
-        public async Task<Result<string>> CreateAsync(CreateOrderRequest createOrderRequest)
+        public async Task<Result<int>> CreateAsync(CreateOrderRequest createOrderRequest)
         {
             if (createOrderRequest is null)
             {
@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
             if (!isDescriptionValid.IsSuccess || !isOrganisationValid.IsSuccess)
             {
                 var allErrors = isDescriptionValid.Errors.Union(isOrganisationValid.Errors);
-                return Result.Failure<string>(allErrors);
+                return Result.Failure<int>(allErrors);
             }
 
             var order = new Order {

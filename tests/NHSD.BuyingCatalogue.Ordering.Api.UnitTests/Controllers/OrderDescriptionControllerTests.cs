@@ -18,6 +18,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [TestFixture]
     internal sealed class OrderDescriptionControllerTests
     {
+        private static int InvalidOrderId = 999;
+
         [Test]
         public void Constructor_NullRepository_Throws()
         {
@@ -34,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrderDescriptionController;
 
-            var response = await controller.GetAsync("INVALID");
+            var response = await controller.GetAsync(InvalidOrderId);
 
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
@@ -42,7 +44,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
         {
-            var orderId = "C0000014-01";
+            //var orderId = "C0000014-01";
+            var orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
             var testData = CreateOrderDescriptionTestData(
@@ -64,7 +67,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Get_OtherOrganisationId_ReturnsForbidden()
         {
-            var orderId = "C0000014-01";
+            //var orderId = "C0000014-01";
+            var orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
             var testData = CreateOrderDescriptionTestData(
@@ -88,14 +92,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrderDescriptionController;
 
-            await controller.GetAsync(string.Empty);
+            await controller.GetAsync(14);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(14), Times.Once);
         }
 
         [TestCase(null)]
-        [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        [TestCase(999)]
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(int orderId)
         {
             var context = OrderDescriptionTestContext.Setup();
 
@@ -115,7 +119,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 var context = OrderDescriptionTestContext.Setup();
 
                 using var controller = context.OrderDescriptionController;
-                await controller.UpdateAsync("OrderId", null);
+                await controller.UpdateAsync(14, null);
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(GetOrderDescriptionWithNullModel);
@@ -124,7 +128,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_ValidationError_ReturnsBadRequest()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             const string description = null;
 
             var context = OrderDescriptionTestContext.Setup();
@@ -150,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, _) = CreateOrderDescriptionTestData(
@@ -172,7 +176,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_OtherOrganisationId_ReturnsForbidden()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, _) = CreateOrderDescriptionTestData(
@@ -194,7 +198,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_UpdateAndGet_CalledOnce()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var newDescription = OrderDescription.Create("New Description").Value;
 
             var context = OrderDescriptionTestContext.Setup();
@@ -219,7 +223,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (Order order, OrderDescriptionModel expectedDescription) CreateOrderDescriptionTestData(
-            string orderId, OrderDescription description, Guid organisationId)
+            int orderId, OrderDescription description, Guid organisationId)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
@@ -239,7 +243,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),

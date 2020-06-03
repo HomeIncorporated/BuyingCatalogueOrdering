@@ -5,17 +5,17 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | Description                | OrganisationId                       |
+        | A Description for OrderId1 | 4af62b99-638c-4247-875e-965239cd0c48 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5321
 Scenario: 1. Get the order summary
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+    When the user makes a request to retrieve the order summary for the order with the description A Description for OrderId1
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | OrganisationId                       | Description                |
+        | 4af62b99-638c-4247-875e-965239cd0c48 | A Description for OrderId1 |
     And the order Summary Sections have the following values
         | Id                   | Status     |
         | description          | complete   |
@@ -34,13 +34,13 @@ Scenario: 2. Get the order summary when the order has a primary ordering party c
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     And Orders exist
-        | OrderId    | Description   | OrganisationId                       | OrganisationContactEmail |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com  |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+        | Description                | OrganisationId                       | OrganisationContactEmail |
+        | A Description for OrderId2 | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com  |
+    When the user makes a request to retrieve the order summary for the order with the description A Description for OrderId2
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | OrganisationId                       | Description                |
+        | 4af62b99-638c-4247-875e-965239cd0c48 | A Description for OrderId2 |
     And the order Summary Sections have the following values
         | Id                  | Status     |
         | description         | complete   |
@@ -59,13 +59,13 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     And Orders exist
-        | OrderId    | Description   | OrganisationId                       | SupplierContactEmail    |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+        | Description                | OrganisationId                       | SupplierContactEmail    |
+        | A Description for OrderId2 | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com |
+    When the user makes a request to retrieve the order summary for the order with the description A Description for OrderId2
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | OrganisationId                       | Description                |
+        | 4af62b99-638c-4247-875e-965239cd0c48 | A Description for OrderId2 |
     And the order Summary Sections have the following values
         | Id                  | Status     |
         | description         | complete   |

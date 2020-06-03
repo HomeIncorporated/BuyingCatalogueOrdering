@@ -21,9 +21,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Update_ValidDateTime_UpdatesAndReturnsNoContent()
         {
+            var myOrderId = 14;
             var context = CommencementDateControllerTestContext.Setup();
             var model = new CommencementDateModel {CommencementDate = DateTime.Now};
-            var result = await context.Controller.Update("myOrder", model);
+            var result = await context.Controller.Update(myOrderId, model);
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(order => order.CommencementDate == model.CommencementDate)));
             result.Should().BeOfType<NoContentResult>();
         }
@@ -31,35 +32,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Update_NullModel_ThrowsException()
         {
+            var myOrderId = 14;
             var context = CommencementDateControllerTestContext.Setup();
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await context.Controller.Update("myOrder", null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await context.Controller.Update(myOrderId, null));
         }
 
         [Test]
         public void Update_NullDateTime_ThrowsException()
         {
+            var myOrderId = 14;
             var context = CommencementDateControllerTestContext.Setup();
             var model = new CommencementDateModel { CommencementDate = null };
-            Assert.ThrowsAsync<ArgumentException>(async () => await context.Controller.Update("myOrder", model));
+            Assert.ThrowsAsync<ArgumentException>(async () => await context.Controller.Update(myOrderId, model));
         }
 
         [Test]
         public async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
         {
+            var myOrderId = 14;
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
-            var result = await context.Controller.Update("myOrder", model);
+            var result = await context.Controller.Update(myOrderId, model);
             result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
         public async Task Update_NoOrderFound_ReturnsNotFound()
         {
+            var myOrderId = 14;
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = null;
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
-            var result = await context.Controller.Update("myOrder", model);
+            var result = await context.Controller.Update(myOrderId, model);
             result.Should().BeOfType<NotFoundResult>();
         }
 
@@ -70,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
                 Order = new Order {OrganisationId = PrimaryOrganisationId};
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),

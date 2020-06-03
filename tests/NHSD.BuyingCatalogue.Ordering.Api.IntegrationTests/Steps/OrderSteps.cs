@@ -39,14 +39,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the order with orderId (.*) has a primary contact")]
-        public async Task ThenTheOrderHasAPrimaryContact(string orderId)
+        public async Task ThenTheOrderHasAPrimaryContact(int orderId)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             order.OrganisationContactId.Should().NotBeNull();
         }
 
         [Given(@"the order with orderId (.*) does not have a primary contact")]
-        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(string orderId)
+        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(int orderId)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             order.OrganisationContactId.Should().BeNull();
@@ -55,8 +55,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"Orders exist")]
         public async Task GivenOrdersExist(Table table)
         {
+            IDictionary<string, int> orderDictionary = new Dictionary<string, int>();
+
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
+
                 int? organisationAddressId = _context.GetAddressIdByPostcode(ordersTableItem.OrganisationAddressPostcode);
                 int? organisationContactId = _context.GetContactIdByEmail(ordersTableItem.OrganisationContactEmail);
 
@@ -71,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
                 var order = OrderEntityBuilder
                     .Create()
-                    .WithOrderId(ordersTableItem.OrderId)
+                     //.WithOrderId(ordersTableItem.OrderId)
                     .WithDescription(ordersTableItem.Description)
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)
@@ -90,9 +93,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithSupplierContactId(supplierContactId)
                     .WithCommencementDate(commencementDate)
                     .Build();
-
-                await order.InsertAsync(_settings.ConnectionString);
+                order.OrderId.Should().BeNull();
+                var orderId = await order.InsertAsync<int>(_settings.ConnectionString);
+                orderDictionary.Add(order.Description,orderId);
             }
+            _context[ScenarioContextKeys.OrderMapDictionary] = orderDictionary;
         }
 
         [When(@"a GET request is made for a list of orders with organisationId (.*)")]
@@ -119,21 +124,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order with orderId (.*) is updated in the database with data")]
-        public async Task ThenTheOrderIsUpdatedInTheDatabase(string orderId, Table table)
+        public async Task ThenTheOrderIsUpdatedInTheDatabase(int orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             table.CompareToInstance(actual);
         }
 
         [Then(@"the order is created in the database with orderId (.*) and data")]
-        public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
+        public async Task ThenTheOrderIsCreatedInTheDatabase(int orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             table.CompareToInstance(actual);
         }
 
+        [Then(@"the order is created in the database with Description (.*) and data")]
+        public async Task ThenTheOrderIsCreatedInTheDatabaseWithDescription(string description, Table table)
+        {
+            var actual = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
+            table.CompareToInstance(actual);
+        }
+
+
         [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]
-        public async Task ThenTheOrderWithOrderIdHasContactData(string orderId, Table table)
+        public async Task ThenTheOrderWithOrderIdHasContactData(int orderId, Table table)
         {
             var expected = table.CreateInstance<ContactEntity>();
 
@@ -144,7 +157,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
-        public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string orderId, Table table)
+        public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(int orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, order.OrganisationAddressId);
@@ -152,18 +165,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
-        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(string orderId)
+        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(int orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
+        [Then(@"the order with Description (.*) has LastUpdated time present and it is the current time")]
+        public async Task ThenOrderDescriptionHasLastUpdatedAtCurrentTime(string description)
+        {
+            var actual = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
+            actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
+        }
+
+
         [Then(@"the order with orderId (.*) has Created time present and it is the current time")]
-        public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(string orderId)
+        public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(int orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
+
+        [Then(@"the order with Description (.*) has Created time present and it is the current time")]
+        public async Task ThenOrderDescriptionHasCreatedAtCurrentTime(string description)
+        {
+            var actual = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
+            actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
+        }
+
 
         private static object CreateOrders(JToken token)
         {

@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_OrderIdDoesNotExists_NotFoundReturned()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
 
             var context = SupplierSectionControllerTestContext.Setup();
 
@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             const string supplierId = "1234";
             const string supplierName = "NHS Supplier";
 
@@ -87,7 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
         {
-            var orderId = "C0000014-01";
+            var orderId = 14;
             var context = SupplierSectionControllerTestContext.Setup();
 
             context.PrimaryOrganisationId = Guid.NewGuid();
@@ -110,15 +110,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.SupplierSectionController;
 
-            const string orderId = "C123";
+            const int orderId = 123;
             await controller.GetAsync(orderId);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
         }
 
         [TestCase(null)]
-        [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        [TestCase(-999)]
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(int orderId)
         {
             var context = SupplierSectionControllerTestContext.Setup();
 
@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 var context = SupplierSectionControllerTestContext.Setup();
 
                 var controller = context.SupplierSectionController;
-                await controller.UpdateAsync("OrderId", null);
+                await controller.UpdateAsync(1, null);
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(GetSupplierSectionWithNullModel);
@@ -149,7 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(false, false)]
         public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             const string supplierId = "1234";
             const string supplierName = "NHS Supplier";
 
@@ -190,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             const string supplierId = "1234";
             const string supplierName = "NHS Supplier";
 
@@ -229,7 +229,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>()))
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>()))
                     .ReturnsAsync(() => Order);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]

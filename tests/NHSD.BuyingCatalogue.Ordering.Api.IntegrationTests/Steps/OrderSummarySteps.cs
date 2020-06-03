@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -13,28 +15,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderSummarySteps
     {
+        private readonly ScenarioContext _context;
         private readonly Response _response;
         private readonly Request _request;
-
+        private readonly Settings _settings;
         private readonly string _orderSummaryUrl;
 
-        public OrderSummarySteps(Response response, Request request, Settings settings)
+        public OrderSummarySteps(Response response, Request request, Settings settings, ScenarioContext context)
         {
             _response = response;
             _request = request;
             _orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
+            _settings = settings;
+            _context = context;
         }
 
-        [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
+        //[When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
+        //public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
+        //{
+        //    await _request.GetAsync(string.Format(_orderSummaryUrl, orderId));
+        //}
+
+        [When(@"the user makes a request to retrieve the order summary for the order with the description (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string description)
         {
+            var orderId = OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description).Id;
             await _request.GetAsync(string.Format(_orderSummaryUrl, orderId));
         }
+
 
         [Then(@"the order summary is returned with the following values")]
         public async Task ThenTheOrderSummaryIsReturnedWithTheFollowingValues(Table table)
         {
             var expected = table.CreateSet<OrderSummaryTable>().FirstOrDefault();
+
+            if (expected!= null)
+            {
+                if (expected.OrderId == null)
+                {
+                    var orderId = _context.GetOrderIdByDescription(expected.Description);
+                    if (orderId != null)
+                    {
+                        expected.OrderId = "" + orderId;
+                    }
+                }
+            }
 
             var response = await _response.ReadBodyAsJsonAsync();
 
@@ -44,7 +69,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 OrganisationId = response.SelectToken("organisationId").ToObject<Guid>(),
                 Description = response.Value<string>("description")
             };
-
             actual.Should().BeEquivalentTo(expected);
         }
 

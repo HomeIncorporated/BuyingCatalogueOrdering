@@ -11,7 +11,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             _order = new Order
             {
-                OrderId = "C000014-01",
+                //OrderId = "C000014-01",
+                OrderId = 14,
                 OrganisationId = Guid.NewGuid(),
                 OrganisationName = "Organisation Name",
                 OrganisationOdsCode = "Ods Code",
@@ -30,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal static OrderBuilder Create() => new OrderBuilder();
 
-        internal OrderBuilder WithOrderId(string orderId)
+        internal OrderBuilder WithOrderId(int orderId)
         {
             _order.OrderId = orderId;
             return this;

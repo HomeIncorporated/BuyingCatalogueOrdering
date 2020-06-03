@@ -8,8 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
     public interface IOrderRepository
     {
         Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId);
-        Task<Order> GetOrderByIdAsync(string orderId);
+        Task<Order> GetOrderByIdAsync(int orderId);
         Task UpdateOrderAsync(Order order);
-        Task<string> CreateOrderAsync(Order order);
+        Task<int> CreateOrderAsync(Order order);
     }
 }

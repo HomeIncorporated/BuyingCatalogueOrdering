@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var orderModelResult = orders.Select(order => new OrderModel
                 {
-                OrderId = order.OrderId,
+                OrderId = ""+order.OrderId,
                 Description = order.Description.Value,
                 LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderId}/summary")]
-        public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
+        public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(int orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -77,7 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return Ok(new OrderSummaryModel
             {
-                OrderId = orderId,
+                OrderId = ""+orderId,
                 OrganisationId = order.OrganisationId,
                 Description = order.Description.Value,
                 Sections = new List<SectionModel>
@@ -121,7 +121,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             if (result.IsSuccess)
             {
-                createOrderResponse.OrderId = result.Value;
+                createOrderResponse.OrderId = ""+result.Value;
                 return CreatedAtAction(nameof(CreateOrderAsync).TrimAsync(), null, new { orderId = result.Value }, createOrderResponse);
             }
 

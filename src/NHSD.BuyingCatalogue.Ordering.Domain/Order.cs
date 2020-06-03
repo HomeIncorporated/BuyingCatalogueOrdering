@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
 

@@ -1,6 +1,7 @@
 ﻿CREATE TABLE dbo.[Order]
 (
-    OrderId NVARCHAR(10) NOT NULL,
+    OrderId INT IDENTITY(1, 1) NOT NULL,
+    DisplayOrderId AS cast ( ('C' + FORMAT(OrderId, '000000') + '-01') as NVARCHAR(10) ),
     [Description] NVARCHAR(100) NOT NULL,
     OrganisationId UNIQUEIDENTIFIER NOT NULL,
     OrganisationName NVARCHAR(256) NULL,

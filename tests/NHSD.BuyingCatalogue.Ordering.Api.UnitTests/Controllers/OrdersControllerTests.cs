@@ -24,6 +24,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [Parallelizable(ParallelScope.All)]
     internal sealed class OrdersControllerTests
     {
+        private static int InvalidOrderId = -999;
+
         [Test]
         public void Constructor_NullRepository_Throws()
         {
@@ -46,8 +48,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCase(null, "Some Description")]
-        [TestCase("C0000014-01", "Some Description")]
-        public async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(string orderId,
+        [TestCase(14, "Some Description")]
+        public async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(int orderId,
             string orderDescription)
         {
             var context = OrdersControllerTestContext.Setup();
@@ -73,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
             var orders = new List<(Order order, OrderModel expected)>
             {
-                CreateOrderTestData("C0000014-01", otherOrganisationId, "A description")
+                CreateOrderTestData(14, otherOrganisationId, "A description")
             };
 
             context.Orders = orders.Select(x => x.order);
@@ -91,8 +93,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var orders = new List<(Order order, OrderModel expected)>
             {
-                CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
-                CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description")
+                CreateOrderTestData(14, context.PrimaryOrganisationId, "Some Description"),
+                CreateOrderTestData(15, context.PrimaryOrganisationId, "Another Description")
             };
 
             context.Orders = orders.Select(x => x.order);
@@ -125,14 +127,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrdersController;
 
-            var response = await controller.GetOrderSummaryAsync("INVALID");
+            var response = await controller.GetOrderSummaryAsync(InvalidOrderId);
             response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new NotFoundResult()));
         }
 
         [Test]
         public async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrdersControllerTestContext.Setup();
 
             (Order order, OrderSummaryModel expected) =
@@ -150,7 +152,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetOrderSummaryAsync_OtherOrganisationId_ReturnResult()
         {
             var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrdersControllerTestContext.Setup();
 
             (Order order, _) = CreateOrderSummaryTestData(orderId, "Some Description", organisationId);
@@ -185,7 +187,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task CreateOrderAsync_CreateOrderSuccessfulResult_ReturnsOrderId()
         {
-            const string newOrderId = "New Test Order Id";
+            const int newOrderId = 14;
 
             var context = OrdersControllerTestContext.Setup();
             context.CreateOrderResult = Result.Success(newOrderId);
@@ -203,7 +205,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var actual = response.Result;
 
             var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(), null,
-                new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId = newOrderId });
+                new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId = newOrderId.ToString() });
 
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -240,7 +242,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrganisationId = context.PrimaryOrganisationId
             };
 
-            context.CreateOrderResult = Result.Failure<string>(errors);
+            context.CreateOrderResult = Result.Failure<int>(errors);
 
             var response = await controller.CreateOrderAsync(createOrderRequest);
 
@@ -268,7 +270,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(
-            string orderId, 
+            int orderId, 
             Guid organisationId,
             string description)
         {
@@ -282,7 +284,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedOrder: new OrderModel
                 {
-                    OrderId = repositoryOrder.OrderId,
+                    OrderId = repositoryOrder.OrderId.ToString(),
                     Description = repositoryOrder.Description.Value,
                     Status = repositoryOrder.OrderStatus.Name,
                     DateCreated = repositoryOrder.Created,
@@ -291,7 +293,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 });
         }
 
-        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(string orderId,
+        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(int orderId,
             string description, Guid organisationId)
         {
             var repositoryOrder = OrderBuilder
@@ -304,7 +306,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedSummary: new OrderSummaryModel
                 {
-                    OrderId = repositoryOrder.OrderId,
+                    OrderId = repositoryOrder.OrderId.ToString(),
                     OrganisationId = repositoryOrder.OrganisationId,
                     Description = repositoryOrder.Description.Value,
                     Sections = new List<SectionModel>
@@ -342,7 +344,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
 
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
@@ -374,7 +376,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
 
-            internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
+            internal Result<int> CreateOrderResult { get; set; } = Result.Success(14);
 
             internal IEnumerable<Order> Orders { get; set; }
 

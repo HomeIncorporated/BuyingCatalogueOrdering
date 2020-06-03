@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -12,14 +13,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderDescriptionSteps
     {
+        private readonly ScenarioContext _context;
         private readonly Response _response;
         private readonly Request _request;
         private readonly Settings _settings;
 
         private readonly string _orderDescriptionUrl;
 
-        public OrderDescriptionSteps(Response response, Request request, Settings settings)
+        public OrderDescriptionSteps(Response response, Request request, Settings settings, ScenarioContext context)
         {
+            _context = context;
             _response = response;
             _request = request;
             _settings = settings;
@@ -32,6 +35,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             await _request.GetAsync(string.Format(_orderDescriptionUrl, orderId));
         }
+
+        [When(@"the user makes a request to retrieve the order description section for order with description (.*)")]
+        public async Task WhenAGetRequestIsMadeForAnOrdersDescriptionSectionForOrderWithOrderDescription(string description)
+        {
+            var orderId = _context.GetOrderIdByDescription(description);
+            await _request.GetAsync(string.Format(_orderDescriptionUrl, orderId));
+        }
+
 
         [Then(@"the order description is returned")]
         public async Task ThenTheOrderDescriptionIsReturned(Table table)
@@ -63,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order description for order with id (.*) is set to")]
-        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(string orderId, Table table)
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(int orderId, Table table)
         {
             var expected = table.CreateInstance<OrderDescriptionTable>().Description;
 
@@ -72,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
-        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string orderId)
+        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, int orderId)
         {
             var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).LastUpdatedByName;
             actual.Should().BeEquivalentTo(expected);

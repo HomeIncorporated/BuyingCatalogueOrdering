@@ -17,6 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [TestFixture]
     internal sealed class OrderingPartyControllerTests
     {
+        private static int InvalidOrderId = -999;
+
         [Test]
         public void Constructor_Null_NullException()
         {
@@ -33,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrderingPartyController;
 
-            var response = await controller.GetAsync("INVALID");
+            var response = await controller.GetAsync(InvalidOrderId);
             response.Should().BeEquivalentTo(new ActionResult<OrderingPartyModel>(new NotFoundResult()));
         }
 
@@ -42,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrderingPartyTestContext.Setup();
 
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             (Order order, _) = CreateOrderingPartyTestData(orderId, Guid.NewGuid());
 
             context.Order = order;
@@ -56,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderingPartyTestContext.Setup();
 
             (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId, false);
@@ -73,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderingPartyTestContext.Setup();
 
             (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
@@ -95,14 +97,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrderingPartyController;
 
-            await controller.GetAsync(string.Empty);
+            await controller.GetAsync(14);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(14), Times.Once);
         }
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(int orderId)
         {
             var context = OrderingPartyTestContext.Setup();
 
@@ -122,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 var context = OrderingPartyTestContext.Setup();
 
                 var controller = context.OrderingPartyController;
-                await controller.UpdateAsync("OrderId", null);
+                await controller.UpdateAsync(14, null);
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(GetOrderingPartyWithModelModel);
@@ -133,7 +135,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(false, false)]
         public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderingPartyTestContext.Setup();
 
             (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
@@ -158,7 +160,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
         {
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
             var context = OrderingPartyTestContext.Setup();
 
             (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
@@ -180,7 +182,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeOfType<NoContentResult>();
         }
 
-        private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(string orderId, Guid organisationId, bool hasOrganisationContact = true)
+        private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(int orderId, Guid organisationId, bool hasOrganisationContact = true)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
@@ -225,7 +227,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),

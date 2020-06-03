@@ -43,6 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderId.Should().Be(responseOrderId);
         }
 
+
         private sealed class CreateOrderPayload
         {
             public Guid OrganisationId { get; set; }

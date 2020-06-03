@@ -44,7 +44,6 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
             (
-                OrderId,
                 Description,
                 OrganisationId,
                 OrganisationName,
@@ -64,7 +63,6 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             )
             VALUES
             (
-                @OrderId,
                 @Description,
                 @OrganisationId,
                 @OrganisationName,
@@ -81,10 +79,16 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @SupplierName,
                 @SupplierAddressId,
                 @SupplierContactId
-            );";
+            );
+            SELECT SCOPE_IDENTITY();";
 
-        public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
+        public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, int? orderId)
         {
+            if (orderId == null)
+            {
+                return null;
+            }
+
             return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
                           OrderId,
                           Description,
@@ -108,5 +112,33 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }
+
+        public static async Task<OrderEntity> FetchOrderByDescription(string connectionString, string description)
+        {
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
+                          OrderId,
+                          Description,
+                          OrganisationId,
+                          OrganisationName,
+                          OrganisationOdsCode,
+                          OrganisationAddressId,
+                          OrganisationContactId,
+                          OrderStatusId,
+                          Created,
+                          SupplierId,
+                          SupplierName,
+                          SupplierAddressId,
+                          SupplierContactId,
+                          LastUpdated,
+                          LastUpdatedBy,
+                          CommencementDate,
+                          LastUpdatedByName,
+                          SupplierId,
+                          SupplierName
+                         FROM dbo.[Order]
+                         WHERE Description = @Description;", new { description }));
+        }
+
+
     }
 }

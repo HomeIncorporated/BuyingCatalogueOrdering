@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<OrderingPartyModel>> GetAsync(string orderId)
+        public async Task<ActionResult<OrderingPartyModel>> GetAsync(int orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> UpdateAsync(string orderId, OrderingPartyModel model)
+        public async Task<ActionResult> UpdateAsync(int orderId, OrderingPartyModel model)
         {
             if (model is null)
             {
