@@ -23,24 +23,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 throw new ArgumentNullException(nameof(createOrderRequest));
             }
 
-            var isDescriptionValid = OrderDescription.Create(createOrderRequest.Description);
-            var isOrganisationValid = OrderOrganisationId.Create(createOrderRequest.OrganisationId);
+            var descriptionResult = OrderDescription.Create(createOrderRequest.Description);
+            var orderOrganisationIdResult = OrderOrganisationId.Create(createOrderRequest.OrganisationId);
 
-            if (!isDescriptionValid.IsSuccess || !isOrganisationValid.IsSuccess)
+            if (!descriptionResult.IsSuccess || !orderOrganisationIdResult.IsSuccess)
             {
-                var allErrors = isDescriptionValid.Errors.Union(isOrganisationValid.Errors);
+                var allErrors = descriptionResult.Errors.Union(orderOrganisationIdResult.Errors);
                 return Result.Failure<string>(allErrors);
             }
 
-            var order = new Order {
-                OrderStatus = new OrderStatus() { OrderStatusId = 2, Name = "Unsubmitted" },
-                OrganisationId = isOrganisationValid.Value,
-                LastUpdatedByName = createOrderRequest.LastUpdatedByName,
-                LastUpdatedBy = createOrderRequest.LastUpdatedById,
-                Created = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow
-            };
-            order.SetDescription(isDescriptionValid.Value);
+            var order = Order.Create(
+                descriptionResult.Value,
+                orderOrganisationIdResult.Value,
+                createOrderRequest.LastUpdatedById,
+                createOrderRequest.LastUpdatedByName);
 
             var orderId = await _orderRepository.CreateOrderAsync(order);
             return Result.Success(orderId);

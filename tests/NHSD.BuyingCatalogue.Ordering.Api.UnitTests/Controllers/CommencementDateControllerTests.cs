@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -67,14 +68,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_WithCommencementDate_ReturnsOkResult(DateTime? commencementDate)
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.CommencementDate = commencementDate;
-            var result = await context.Controller.GetAsync("myOrder");
-            result.Should().BeOfType<OkObjectResult>();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithCommencementDate(commencementDate)
+                .Build();
 
-            var okResult = result as OkObjectResult;
-            okResult.Value.Should().BeOfType<CommencementDateModel>();
-            var model = okResult.Value as CommencementDateModel;
-            model.CommencementDate.Should().Be(context.Order.CommencementDate);
+            var result = await context.Controller.GetAsync("myOrder") as OkObjectResult;
+            Assert.IsNotNull(result);
+
+            CommencementDateModel expected = new CommencementDateModel
+            {
+                CommencementDate = commencementDate
+            };
+
+            result.Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
@@ -91,7 +99,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
-            context.Order.CommencementDate = DateTime.Now;
             var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<ForbidResult>();
         }
@@ -107,15 +114,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             private CommencementDateControllerTestContext()
             {
                 PrimaryOrganisationId = Guid.NewGuid();
-                Order = new Order {OrganisationId = PrimaryOrganisationId};
+                UserId = Guid.NewGuid();
+                Username = "Test User";
+
+                Order = OrderBuilder.Create().WithOrganisationId(PrimaryOrganisationId).Build();
+
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Name, Username),
+                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString())
                 }, "mock"));
 
                 Controller = new CommencementDateController(OrderRepositoryMock.Object)
@@ -128,6 +139,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
 
             internal Guid PrimaryOrganisationId { get; }
+
+            internal Guid UserId { get; }
+
+            internal string Username { get; }
 
             internal ClaimsPrincipal ClaimsPrincipal { get; }
 

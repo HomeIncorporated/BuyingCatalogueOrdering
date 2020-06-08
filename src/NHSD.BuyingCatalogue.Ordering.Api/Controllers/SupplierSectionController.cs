@@ -71,14 +71,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            order.SupplierId = model.SupplierId;
-            order.SupplierName = model.Name;
-
-            order.SupplierAddress = order.SupplierAddress.FromModel(model.Address);
-            order.SupplierContact = order.SupplierContact.FromModel(model.PrimaryContact);
-
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.ChangeSupplier(
+                model.SupplierId,
+                model.Name,
+                order.SupplierAddress.FromModel(model.Address),
+                order.SupplierContact.FromModel(model.PrimaryContact),
+                User.GetUserId(),
+                User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();

@@ -3,17 +3,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
+namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 {
-    public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
+    public sealed class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             if(builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(x => x.Description).HasConversion<string>(description => description.Value,
+            builder.Property(x => x.Description).HasConversion(description => description.Value,
                 data => OrderDescription.Create(data).Value);
+
+            builder
+                .HasMany(x => x.ServiceRecipients)
+                .WithOne(p => p.Order);
         }
     }
 }

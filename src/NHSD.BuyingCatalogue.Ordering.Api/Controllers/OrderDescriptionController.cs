@@ -71,16 +71,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var isValid = OrderDescription.Create(model.Description);
-
             if (!isValid.IsSuccess)
             {
                 return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
             }
 
-            order.SetDescription(isValid.Value);
-            
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.ChangeDescription(isValid.Value, User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
 

@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
-            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            var actual = order.IsServiceRecipientsSectionComplete();
             actual.Should().BeTrue();
         }
 
@@ -87,7 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
-            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            var actual = order.IsServiceRecipientsSectionComplete();
             actual.Should().BeFalse();
         }
     }

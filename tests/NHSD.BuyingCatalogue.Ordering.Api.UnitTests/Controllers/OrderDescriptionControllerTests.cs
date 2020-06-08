@@ -212,7 +212,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await controller.UpdateAsync(orderId,
                     new OrderDescriptionModel { Description = newDescription.Value });
 
-            order.SetDescription(newDescription);
+            order.ChangeDescription(newDescription, context.UserId, context.Username);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(order), Times.Once);
@@ -237,15 +237,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             private OrderDescriptionTestContext()
             {
                 PrimaryOrganisationId = Guid.NewGuid();
+                
+                UserId = Guid.NewGuid();
+                Username = "Test User";
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Name, Username),
+                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString())
                 }, "mock"));
 
                 OrderDescriptionController = new OrderDescriptionController(OrderRepositoryMock.Object)
@@ -258,6 +262,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
 
             internal Guid PrimaryOrganisationId { get; }
+
+            internal Guid UserId { get; }
+
+            internal string Username { get; }
 
             internal ClaimsPrincipal ClaimsPrincipal { get; }
 

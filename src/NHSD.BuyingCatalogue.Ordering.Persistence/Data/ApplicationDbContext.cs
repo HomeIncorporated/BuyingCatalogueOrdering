@@ -1,14 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
     public sealed class ApplicationDbContext : DbContext
     {
         public DbSet<Order> Order { get; set; }
-
-        public DbSet<OrderStatus> OrderStatus { get; set; }
 
         public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
 
@@ -26,8 +25,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new OrderConfiguration());
-            modelBuilder.ApplyConfiguration(new ServiceRecipientConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderStatusEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ServiceRecipientEntityTypeConfiguration());
         }
     }
 }

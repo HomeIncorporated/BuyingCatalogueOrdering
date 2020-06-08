@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
+namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 {
-    public sealed class ServiceRecipientConfiguration : IEntityTypeConfiguration<ServiceRecipient>
+    public sealed class ServiceRecipientEntityTypeConfiguration : IEntityTypeConfiguration<ServiceRecipient>
     {
         public void Configure(EntityTypeBuilder<ServiceRecipient> builder)
         {
@@ -13,6 +13,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
                 throw new ArgumentNullException(nameof(builder));
 
             builder.HasKey(x => x.OdsCode);
+            
+            builder.Property<int>(nameof(Order.OrderId))
+                .IsRequired();
         }
     }
 }

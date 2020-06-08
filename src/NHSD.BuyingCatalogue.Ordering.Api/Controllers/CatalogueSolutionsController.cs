@@ -59,10 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            order.CatalogueSolutionsViewed = true;
-
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.MarkCatalogueSolutionsAsViewed(User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();

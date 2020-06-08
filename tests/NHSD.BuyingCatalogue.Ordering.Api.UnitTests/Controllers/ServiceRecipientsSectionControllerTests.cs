@@ -157,7 +157,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             private ServiceRecipientsTestContext()
             {
                 PrimaryOrganisationId = Guid.NewGuid();
-                Order = new Order { OrganisationId = PrimaryOrganisationId };
+                Order = OrderBuilder.Create().WithOrganisationId(PrimaryOrganisationId).Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);

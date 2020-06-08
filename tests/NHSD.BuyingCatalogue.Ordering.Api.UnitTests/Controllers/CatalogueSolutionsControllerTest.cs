@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
+            context.Order.ChangeDescription(OrderDescription.Create(expectedDescription).Value, Guid.NewGuid(), "Some user name");
             var result = await context.Controller.GetAllAsync("myOrder");
             result.Value.Should().BeOfType<CatalogueSolutionsModel>();
             var model = result.Value;
@@ -86,7 +87,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             private CatalogueSolutionsControllerTestContext()
             {
                 PrimaryOrganisationId = Guid.NewGuid();
-                Order = new Order { OrganisationId = PrimaryOrganisationId };
+                Order = OrderBuilder.Create().WithOrganisationId(PrimaryOrganisationId).Build();
+
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);

@@ -5,121 +5,144 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrderBuilder
     {
-        private readonly Order _order;
+
+        private string _orderId;
+        private string _orderDescription;
+        private Guid _organisationId;
+        private readonly string _organisationName;
+        private readonly string _organisationOdsCode;
+        private readonly Address _organisationAddress;
+        private Contact _organisationContact;
+        private DateTime _created;
+        private DateTime _lastUpdated;
+        private readonly Guid _lastUpdatedBy;
+        private readonly string _lastUpdatedByName;
+        private string _supplierId;
+        private string _supplierName;
+        private Address _supplierAddress;
+        private Contact _supplierContact;
+        private DateTime? _commencementDate;
+        private bool _serviceRecipientsViewed;
+        private readonly bool _catalogueSolutionsViewed;
 
         private OrderBuilder()
         {
-            _order = new Order
-            {
-                OrderId = "C000014-01",
-                OrganisationId = Guid.NewGuid(),
-                OrganisationName = "Organisation Name",
-                OrganisationOdsCode = "Ods Code",
-                OrganisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build(),
-                Created = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow,
-                LastUpdatedBy = Guid.NewGuid(),
-                LastUpdatedByName = "Bob Smith",
-                OrderStatus = new OrderStatus() { OrderStatusId = 1, Name = "Submitted" },
-                SupplierId = "Some supplier id",
-                SupplierName = "Some supplier name",
-                SupplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build()
-            };
-            _order.SetDescription(OrderDescription.Create("Some Description").Value);
+            _orderId = "C000014-01";
+            _orderDescription = "Some Description";
+            _organisationId = Guid.NewGuid();
+            _organisationName = "Organisation Name";
+            _organisationOdsCode = "Ods Code";
+            _organisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build();
+            _organisationContact = null;
+            _created = DateTime.UtcNow;
+            _lastUpdated = DateTime.UtcNow;
+            _lastUpdatedBy = Guid.NewGuid();
+            _lastUpdatedByName = "Bob Smith";
+            _supplierId = "Some supplier id";
+            _supplierName = "Some supplier name";
+            _supplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build();
+            _supplierContact = null;
+            _commencementDate = null;
+            _serviceRecipientsViewed = false;
+            _catalogueSolutionsViewed = false;
         }
 
         internal static OrderBuilder Create() => new OrderBuilder();
 
         internal OrderBuilder WithOrderId(string orderId)
         {
-            _order.OrderId = orderId;
+            _orderId = orderId;
             return this;
         }
 
         internal OrderBuilder WithDescription(string description)
         {
-            _order.SetDescription(OrderDescription.Create(description).Value);
+            _orderDescription = description;
             return this;
         }
 
         internal OrderBuilder WithOrganisationId(Guid organisationId)
         {
-            _order.OrganisationId = organisationId;
-            return this;
-        }
-
-        internal OrderBuilder WithCreated(DateTime created)
-        {
-            _order.Created = created;
-            return this;
-        }
-
-        internal OrderBuilder WithLastUpdated(DateTime lastUpdated)
-        {
-            _order.LastUpdated = lastUpdated;
-            return this;
-        }
-
-        internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
-        {
-            _order.LastUpdatedBy = lastUpdatedBy;
-            return this;
-        }
-
-        internal OrderBuilder WithLastUpdatedBy(string lastUpdatedByName)
-        {
-            _order.LastUpdatedByName = lastUpdatedByName;
-            return this;
-        }
-
-        internal OrderBuilder WithOrderStatus(OrderStatus orderStatus)
-        {
-            _order.OrderStatus = orderStatus;
+            _organisationId = organisationId;
             return this;
         }
 
         internal OrderBuilder WithOrganisationContact(Contact organisationContact)
         {
-            _order.OrganisationContact = organisationContact;
+            _organisationContact = organisationContact;
             return this;
         }
 
         internal OrderBuilder WithSupplierId(string supplierId)
         {
-            _order.SupplierId = supplierId;
+            _supplierId = supplierId;
             return this;
         }
 
         internal OrderBuilder WithSupplierName(string supplierName)
         {
-            _order.SupplierName = supplierName;
+            _supplierName = supplierName;
             return this;
         }
 
         internal OrderBuilder WithSupplierAddress(Address supplierAddress)
         {
-            _order.SupplierAddress = supplierAddress;
+            _supplierAddress = supplierAddress;
             return this;
         }
 
         internal OrderBuilder WithSupplierContact(Contact supplierContact)
         {
-            _order.SupplierContact = supplierContact;
+            _supplierContact = supplierContact;
             return this;
         }
 
         internal OrderBuilder WithCommencementDate(DateTime? commencementDate)
         {
-            _order.CommencementDate = commencementDate;
+            _commencementDate = commencementDate;
             return this;
         }
 
         internal OrderBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
         {
-            _order.ServiceRecipientsViewed = serviceRecipientsViewed;
+            _serviceRecipientsViewed = serviceRecipientsViewed;
             return this;
         }
 
-        internal Order Build() => _order;
+        internal Order Build()
+        {
+            var descriptionResult = OrderDescription.Create(_orderDescription);
+
+            var order = Order.Create(descriptionResult.Value, _organisationId, _lastUpdatedBy, _lastUpdatedByName);
+
+            order.OrderId = _orderId;
+
+            order.ChangeOrderParty(
+                _organisationName, 
+                _organisationOdsCode, 
+                _organisationAddress, 
+                _organisationContact, 
+                _lastUpdatedBy, 
+                _lastUpdatedByName);
+
+            order.SupplierId = _supplierId;
+            order.SupplierName = _supplierName;
+            order.SupplierAddress = _supplierAddress;
+            order.SupplierContact = _supplierContact;
+
+            if (_commencementDate.HasValue)
+            {
+                order.ChangeCommencementDate(_commencementDate.Value, _lastUpdatedBy, _lastUpdatedByName);
+            }
+
+            order.ServiceRecipientsViewed = _serviceRecipientsViewed;
+
+            if (_catalogueSolutionsViewed)
+            {
+                order.MarkCatalogueSolutionsAsViewed(_lastUpdatedBy, _lastUpdatedByName);
+            }
+
+            return order;
+        }
     }
 }
