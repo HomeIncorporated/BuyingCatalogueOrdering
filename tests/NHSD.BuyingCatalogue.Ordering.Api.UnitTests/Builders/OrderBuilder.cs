@@ -125,10 +125,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 _lastUpdatedBy, 
                 _lastUpdatedByName);
 
-            order.SupplierId = _supplierId;
-            order.SupplierName = _supplierName;
-            order.SupplierAddress = _supplierAddress;
-            order.SupplierContact = _supplierContact;
+            order.ChangeSupplier(
+                _supplierId, 
+                _supplierName, 
+                _supplierAddress, 
+                _supplierContact, 
+                _lastUpdatedBy, 
+                _lastUpdatedByName);
 
             if (_commencementDate.HasValue)
             {

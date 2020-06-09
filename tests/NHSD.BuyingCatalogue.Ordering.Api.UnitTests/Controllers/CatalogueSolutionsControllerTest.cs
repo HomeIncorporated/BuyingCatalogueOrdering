@@ -31,8 +31,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().Build();
+
             var result = await context.Controller.UpdateAsync("myOrder");
+
             result.Should().BeOfType<ForbidResult>();
         }
 
@@ -71,8 +73,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAllAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().Build();
+
             var result = await context.Controller.GetAllAsync("myOrder");
+
             result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new ForbidResult()));
         }
 

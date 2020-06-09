@@ -9,14 +9,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         private readonly List<ServiceRecipient> _serviceRecipients;
 
+        private Order()
+        {
+        }
+
         private Order(
             OrderDescription orderDescription,
-            Guid organisationId)
+            Guid organisationId) : this()
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
             OrganisationId = organisationId;
             OrderStatus = OrderStatus.Unsubmitted;
             Created = DateTime.UtcNow;
+
             _serviceRecipients = new List<ServiceRecipient>();
         }
 
@@ -37,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public OrderDescription Description { get; private set; }
 
-        public Guid OrganisationId { get; set; }
+        public Guid OrganisationId { get; private set; }
 
         public string OrganisationName { get; private set; }
 
@@ -49,11 +54,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; }
 
-        public DateTime LastUpdated { get; set; }
+        public DateTime LastUpdated { get; private set; }
 
-        public Guid LastUpdatedBy { get; set; }
+        public Guid LastUpdatedBy { get; private set; }
 
-        public string LastUpdatedByName { get; set; }
+        public string LastUpdatedByName { get; private set; }
 
         public OrderStatus OrderStatus { get; }
 
@@ -61,13 +66,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool CatalogueSolutionsViewed { get; private set; }
 
-        public string SupplierId { get; set; } 
+        public string SupplierId { get; private set; } 
 
-        public string SupplierName { get; set; }
+        public string SupplierName { get; private set; }
 
-        public Address SupplierAddress { get; set; }
+        public Address SupplierAddress { get; private set; }
 
-        public Contact SupplierContact { get; set; }
+        public Contact SupplierContact { get; private set; }
 
         public DateTime? CommencementDate { get; private set; }
 
@@ -137,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             ChangeLastUpdatedBy(userId, name);
         }
 
-        public void ChangeServiceRecipients(IList<ServiceRecipient> serviceRecipients)
+        public void ChangeServiceRecipients(IList<ServiceRecipient> serviceRecipients, Guid userId, string name)
         {
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));
@@ -172,6 +177,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                     Order = this
                 });
             }
+
+            ChangeLastUpdatedBy(userId, name);
         }
     }
 }

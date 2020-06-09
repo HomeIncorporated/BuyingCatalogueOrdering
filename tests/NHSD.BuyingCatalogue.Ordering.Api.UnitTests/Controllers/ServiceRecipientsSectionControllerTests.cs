@@ -55,9 +55,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().Build();
 
             var response = await context.Controller.GetAllAsync("myOrder");
+
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(new ForbidResult()));
         }
 

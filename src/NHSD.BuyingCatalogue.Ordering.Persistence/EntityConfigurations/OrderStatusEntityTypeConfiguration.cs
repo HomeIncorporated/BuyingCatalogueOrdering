@@ -14,7 +14,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 
             builder.ToTable("OrderStatus");
 
-            builder.HasKey(x => x.Id);
+            builder.HasKey(o => o.Id);
+
+            builder.Property(o => o.Id)
+                .HasColumnName("OrderStatusId")
+                .IsRequired()
+                .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
+
+            builder.Property(o => o.Name)
+                .HasColumnName("Name")
+                .IsRequired()
+                .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Domain.Common;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 {
@@ -12,12 +13,77 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
             if(builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(x => x.Description).HasConversion(description => description.Value,
-                data => OrderDescription.Create(data).Value);
+            builder.ToTable("Order");
+
+            builder.HasKey(o => o.OrderId);
+
+            builder.Property(x => x.Description)
+                .HasColumnName("Description")
+                .HasConversion(
+                    description => description.Value,
+                    data => OrderDescription.Create(data).Value);
+
+            builder.Property(o => o.OrganisationId)
+                .HasColumnName("OrganisationId")
+                .IsRequired();
+
+            builder.Property(o => o.OrganisationName)
+                .HasColumnName("OrganisationName");
+
+            builder.Property(o => o.OrganisationOdsCode)
+                .HasColumnName("OrganisationOdsCode");
 
             builder
                 .HasMany(x => x.ServiceRecipients)
                 .WithOne(p => p.Order);
+
+            builder.HasOne(o => o.OrganisationAddress)
+                ;
+
+            builder.HasOne(o => o.OrganisationContact)
+                ;
+
+            builder
+                .Property(x => x.OrderStatus)
+                .HasConversion(orderStatus => orderStatus.Id, data => Enumeration.FromValue<OrderStatus>(data))
+                .HasColumnName("OrderStatusId");
+
+            builder.Property(o => o.ServiceRecipientsViewed)
+                .HasColumnName("ServiceRecipientsViewed");
+
+            builder.Property(o => o.SupplierId)
+                .HasColumnName("SupplierId");
+
+            builder.Property(o => o.SupplierName)
+                .HasColumnName("SupplierName");
+
+            builder.HasOne(o => o.SupplierAddress)
+                ;
+
+            builder.HasOne(o => o.SupplierContact);
+
+            builder.Property(o => o.CatalogueSolutionsViewed)
+                .HasColumnName("CatalogueSolutionsViewed");
+
+            builder.Property(o => o.CommencementDate)
+                .HasColumnName("CommencementDate");
+
+            builder.Property(o => o.Created)
+                .HasColumnName("Created");
+
+            builder.Property(o => o.LastUpdated)
+                .HasColumnName("LastUpdated")
+                .IsRequired();
+
+            builder.Property(o => o.LastUpdatedBy)
+                .HasColumnName("LastUpdatedBy")
+                .IsRequired();
+
+            builder.Property(o => o.LastUpdatedByName)
+                .HasColumnName("LastUpdatedByName")
+                .IsRequired();
+
+            //    OrganisationBillingAddressId INT NULL,
         }
     }
 }

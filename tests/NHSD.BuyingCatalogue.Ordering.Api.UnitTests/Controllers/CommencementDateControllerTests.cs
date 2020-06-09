@@ -47,9 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().Build();
+
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
             var result = await context.Controller.Update("myOrder", model);
+
             result.Should().BeOfType<ForbidResult>();
         }
 
@@ -98,8 +100,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().Build();
+
             var result = await context.Controller.GetAsync("myOrder");
+
             result.Should().BeOfType<ForbidResult>();
         }
 
