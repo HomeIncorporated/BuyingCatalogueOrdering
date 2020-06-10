@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -79,9 +81,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
+            var sections = response.SelectToken("sections");
+            Assert.IsNotNull(sections);
+
             var actual = new SectionsTable
             {
-                Sections = response.SelectToken("sections").ToObject<IEnumerable<SectionTable>>()
+                Sections = sections.ToObject<IEnumerable<SectionTable>>()
             };
 
             actual.Sections.Should().BeEquivalentTo(expected);
@@ -104,7 +109,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class SectionTable
         {
             public string Id { get; set; }
+
             public string Status { get; set; }
+
+            public int? Count { get; set; }
         }
     }
 }

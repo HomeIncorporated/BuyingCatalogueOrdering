@@ -7,5 +7,7 @@
         internal const string ContactMapDictionary = nameof(ContactMapDictionary);
         internal const string OrderMapDictionary = nameof(OrderMapDictionary);
         internal const string OrganisationPayloadDictionary = nameof(OrganisationPayloadDictionary);
+        internal const string SupplierAddress = nameof(SupplierAddress);
+        internal const string SupplierContact = nameof(SupplierContact);
     }
 }

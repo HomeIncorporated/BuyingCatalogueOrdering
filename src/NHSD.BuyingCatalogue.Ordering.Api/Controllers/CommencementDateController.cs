@@ -9,7 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/commencement-date")]
+    [Route("api/v1/orders/{orderId}/sections/commencement-date")]
     [ApiController]
     [Produces("application/json")]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
@@ -23,9 +23,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult Get()
+        public async Task<ActionResult> GetAsync(string orderId)
         {
-            var result = new CommencementDateModel { CommencementDate = DateTime.UtcNow };
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var result = new CommencementDateModel { CommencementDate = order.CommencementDate };
 
             return Ok(result);
         }

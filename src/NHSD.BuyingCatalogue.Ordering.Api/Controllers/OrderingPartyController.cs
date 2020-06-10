@@ -74,6 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync(int orderId, OrderingPartyModel model)
         {
             if (model is null)
@@ -95,8 +96,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.OrganisationName = model.Name;
             order.OrganisationOdsCode = model.OdsCode;
-            order.OrganisationContact.FromModel(model.PrimaryContact);
-            order.OrganisationAddress.FromModel(model.Address);
+            order.OrganisationContact = order.OrganisationContact.FromModel(model.PrimaryContact);
+            order.OrganisationAddress = order.OrganisationAddress.FromModel(model.Address);
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);

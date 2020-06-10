@@ -7,7 +7,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -51,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync(int orderId, SupplierModel model)
         {
             if (model is null)
@@ -74,8 +74,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             order.SupplierId = model.SupplierId;
             order.SupplierName = model.Name;
 
-            order.SupplierAddress.FromModel(model.Address);
-            order.SupplierContact.FromModel(model.PrimaryContact);
+            order.SupplierAddress = order.SupplierAddress.FromModel(model.Address);
+            order.SupplierContact = order.SupplierContact.FromModel(model.PrimaryContact);
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
