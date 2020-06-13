@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Common;
 
@@ -35,13 +36,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 
             builder
                 .HasMany(x => x.ServiceRecipients)
-                .WithOne(p => p.Order);
+                .WithOne(s => s.Order);
 
             builder.HasOne(o => o.OrganisationAddress)
-                ;
+                .WithOne()
+                .HasForeignKey<Order>(order => order.OrganisationAddressId);
 
             builder.HasOne(o => o.OrganisationContact)
-                ;
+                .WithOne()
+                .HasForeignKey<Order>(o => o.OrganisationContactId);
 
             builder
                 .Property(x => x.OrderStatus)
@@ -58,9 +61,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
                 .HasColumnName("SupplierName");
 
             builder.HasOne(o => o.SupplierAddress)
-                ;
+                .WithOne()
+                .HasForeignKey<Order>(order => order.SupplierAddressId);
 
-            builder.HasOne(o => o.SupplierContact);
+            builder.HasOne(o => o.SupplierContact)
+                .WithOne()
+                .HasForeignKey<Order>(o => o.SupplierContactId);
 
             builder.Property(o => o.CatalogueSolutionsViewed)
                 .HasColumnName("CatalogueSolutionsViewed");

@@ -9,6 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -46,32 +47,45 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var serviceRecipients =
-                (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
-
-            var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
+            return new ServiceRecipientsModel
             {
-                OdsCode = recipient.OdsCode,
-                Name = recipient.Name
-            }).ToList();
-
-            var model = new ServiceRecipientsModel
-            {
-                ServiceRecipients = recipientModelList
+                ServiceRecipients = order.ServiceRecipients.Select(recipient => new ServiceRecipientModel
+                {
+                    OdsCode = recipient.OdsCode,
+                    Name = recipient.Name
+                }).ToList()
             };
-
-            return model;
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult Update(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> Update(string orderId, ServiceRecipientsModel model)
         {
-            _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+            
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var serviceRecipients = model.ServiceRecipients
+                .Select(x => new ServiceRecipient(x.OdsCode, x.Name)).ToList();
+
+            order.ChangeServiceRecipients(serviceRecipients, User.GetUserId(), User.GetUserName());
+
+            await _orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }
-
-        private static readonly Dictionary<string, ServiceRecipientsModel> _cannedData = new Dictionary<string, ServiceRecipientsModel>();
     }
 }

@@ -46,6 +46,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
 
             builder.Property(o => o.Country)
                 .HasColumnName("Country");
+
+            builder.HasOne<Order>()
+                .WithOne(o => o.OrganisationAddress)
+                .HasPrincipalKey<Address>(address => address.AddressId);
+
+            builder
+                .HasOne<Order>()
+                .WithOne(o => o.SupplierAddress)
+                .HasPrincipalKey<Address>(address => address.AddressId);
         }
     }
 }

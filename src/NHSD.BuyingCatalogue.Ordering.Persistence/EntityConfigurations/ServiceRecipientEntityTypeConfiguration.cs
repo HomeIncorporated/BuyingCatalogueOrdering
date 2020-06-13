@@ -12,9 +12,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations
             if(builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.HasKey(x => x.OdsCode);
-            
-            builder.Property<int>(nameof(Order.OrderId))
+            builder.ToTable("ServiceRecipient");
+
+            builder.HasKey(x => new { x.OdsCode, x.OrderId });
+
+            builder.Property(serviceRecipient => serviceRecipient.OdsCode)
+                .HasColumnName("OdsCode")
+                .IsRequired();
+
+            builder.Property(serviceRecipient => serviceRecipient.OrderId)
+                .HasColumnName("OrderId")
+                .IsRequired();
+
+            builder.HasOne(serviceRecipient => serviceRecipient.Order)
+                .WithMany(o => o.ServiceRecipients);
+
+            builder.Property(serviceRecipient => serviceRecipient.Name)
+                .HasColumnName("Name")
                 .IsRequired();
         }
     }

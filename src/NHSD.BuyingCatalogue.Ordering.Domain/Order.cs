@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
-        private readonly List<ServiceRecipient> _serviceRecipients;
+        private readonly List<ServiceRecipient> _serviceRecipients = new List<ServiceRecipient>();
 
         private Order()
         {
@@ -21,8 +21,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             OrganisationId = organisationId;
             OrderStatus = OrderStatus.Unsubmitted;
             Created = DateTime.UtcNow;
-
-            _serviceRecipients = new List<ServiceRecipient>();
         }
 
         public static Order Create(
@@ -48,7 +46,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string OrganisationOdsCode { get; private set; }
 
+        public int? OrganisationAddressId { get; }
+
         public Address OrganisationAddress { get; private set; }
+
+        public int? OrganisationContactId { get; }
 
         public Contact OrganisationContact { get; private set; }
 
@@ -70,7 +72,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string SupplierName { get; private set; }
 
+        public int? SupplierAddressId { get; }
+
         public Address SupplierAddress { get; private set; }
+        
+        public int? SupplierContactId { get; }
 
         public Contact SupplierContact { get; private set; }
 
@@ -147,36 +153,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));
 
-            var newList = new List<ServiceRecipient>();
-            var deleteList = _serviceRecipients.ToList();
-
-            foreach (ServiceRecipient newServiceRecipient in serviceRecipients)
+            foreach (var serviceRecipient in serviceRecipients)
             {
-                var serviceRecipient = _serviceRecipients.FirstOrDefault(item => newServiceRecipient.Equals(item));
-                if (serviceRecipient is null)
-                {
-                    newList.Add(newServiceRecipient);
-                }
-                else
-                {
-                    deleteList.Remove(newServiceRecipient);
-                }
+                serviceRecipient.SetOrder(this);
             }
 
-            foreach (ServiceRecipient serviceRecipient in deleteList)
-            {
-                _serviceRecipients.Remove(serviceRecipient);
-            }
-
-            foreach (ServiceRecipient newServiceRecipient in newList)
-            {
-                _serviceRecipients.Add(new ServiceRecipient
-                {
-                    OdsCode = newServiceRecipient.OdsCode,
-                    Name = newServiceRecipient.Name,
-                    Order = this
-                });
-            }
+            _serviceRecipients.Clear();
+            _serviceRecipients.AddRange(serviceRecipients);
 
             ChangeLastUpdatedBy(userId, name);
         }
