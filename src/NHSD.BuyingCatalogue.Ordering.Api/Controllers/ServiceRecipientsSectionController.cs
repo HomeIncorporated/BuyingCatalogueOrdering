@@ -20,14 +20,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
-        public ServiceRecipientsSectionController(IOrderRepository orderRepository,
-            IServiceRecipientRepository serviceRecipientRepository)
+        public ServiceRecipientsSectionController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _serviceRecipientRepository = serviceRecipientRepository ??
-                                          throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]

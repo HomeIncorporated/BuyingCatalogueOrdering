@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations;
 
@@ -7,13 +8,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
     public sealed class ApplicationDbContext : DbContext
     {
+        private readonly ILoggerFactory _loggerFactory;
+
         public DbSet<Order> Order { get; set; }
 
-        public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            ILoggerFactory loggerFactory) 
             : base(options)
         {
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+
+            optionsBuilder?.UseLoggerFactory(_loggerFactory);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
