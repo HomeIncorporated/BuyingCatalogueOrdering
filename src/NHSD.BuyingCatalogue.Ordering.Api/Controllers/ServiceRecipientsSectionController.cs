@@ -46,19 +46,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return new ServiceRecipientsModel
             {
                 ServiceRecipients = order.ServiceRecipients.Select(recipient => new ServiceRecipientModel
-                {
-                    OdsCode = recipient.OdsCode,
-                    Name = recipient.Name
+            {
+                OdsCode = recipient.OdsCode,
+                Name = recipient.Name
                 }).ToList()
             };
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> Update(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> UpdateAsync(string orderId, ServiceRecipientsModel model)
         {
             if (model is null)
-            {
+        {
                 throw new ArgumentNullException(nameof(model));
             }
 
@@ -66,8 +66,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-            
+        }
+
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != order.OrganisationId)
             {

@@ -134,16 +134,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 _lastUpdatedByName);
 
             if (_commencementDate.HasValue)
-            {
+        {
                 order.ChangeCommencementDate(_commencementDate.Value, _lastUpdatedBy, _lastUpdatedByName);
-            }
+        }
 
             order.ServiceRecipientsViewed = _serviceRecipientsViewed;
 
             if (_catalogueSolutionsViewed)
-            {
+        {
                 order.MarkCatalogueSolutionsAsViewed(_lastUpdatedBy, _lastUpdatedByName);
-            }
+        }
 
             return order;
         }

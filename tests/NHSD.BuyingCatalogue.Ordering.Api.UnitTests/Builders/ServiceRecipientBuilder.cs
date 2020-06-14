@@ -11,6 +11,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private ServiceRecipientBuilder()
         {
             _name = "Some name";
+                Name = "Some name",
+                Order = OrderBuilder.Create().Build()
+            };
         }
 
         internal static ServiceRecipientBuilder Create() 
@@ -36,5 +39,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
             return serviceRecipient;
         }
+
     }
 }
