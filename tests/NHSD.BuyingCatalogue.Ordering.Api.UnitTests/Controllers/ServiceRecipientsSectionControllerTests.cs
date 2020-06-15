@@ -23,19 +23,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Ctor_NullRepository_Throws()
         {
-            var context = ServiceRecipientsTestContext.Setup(); 
-            var orderRepository = context.OrderRepositoryMock.Object;
-            var serviceRecipientRepository = context.ServiceRecipientRepositoryMock.Object;
-
-            if (!hasOrderRepository)
-                orderRepository = null;
-            if (!hasServiceRepository)
-                serviceRecipientRepository = null;
-
-            Assert.Throws<ArgumentNullException>(() =>
+            static void Test()
             {
                 var _ = new ServiceRecipientsSectionController(null);
+            }
 
+            Assert.Throws<ArgumentNullException>(Test);
         }
 
         [TestCase(null)]
@@ -126,18 +119,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
         }
 
-        [Test]
-        public async Task GetAllAsync_VerifyRepositoryMethods_CalledOnce()
-        {
-            var context = ServiceRecipientsTestContext.Setup();
-
-            await context.Controller.GetAllAsync(string.Empty);
-
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
-            context.ServiceRecipientRepositoryMock.Verify(x => x.ListServiceRecipientsByOrderIdAsync(string.Empty),
-                Times.Once);
-        }
-
         [TestCase(null)]
         [TestCase("INVALID")]
         public async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
@@ -153,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder.Create().WithOrganisationId(Guid.NewGuid()).Build();
 
             var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
             response.Should().BeEquivalentTo(new ForbidResult());
@@ -255,17 +236,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(expectedOrderId), Times.Once);
-        }
-
-        [Test]
-        public async Task UpdateAsync_ServiceRecipientRepository_UpdateAsyncCalledOnce()
-        {
-            var context = ServiceRecipientsTestContext.Setup();
-
-            string expectedOrderId = context.Order.OrderId;
-            await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
-
-            context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
         }
 
         private static ServiceRecipientsModel DefaultServiceRecipientsModel

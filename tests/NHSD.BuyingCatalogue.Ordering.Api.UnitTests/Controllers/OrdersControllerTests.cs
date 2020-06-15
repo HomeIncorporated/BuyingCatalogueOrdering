@@ -24,13 +24,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [Parallelizable(ParallelScope.All)]
     internal sealed class OrdersControllerTests
     {
-        [TestCase(true, false, false)]
-        [TestCase(false, true, false)]
-        [TestCase(false, false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
         public void Constructor_NullParameter_ThrowsArgumentNullException(
             bool isOrderRepositoryNull,
-            bool isCreateOrderServiceNull,
-            bool isServiceRecipientRepositoryNull)
+            bool isCreateOrderServiceNull)
         {
             void Test()
             {
@@ -38,7 +36,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Create()
                     .WithOrderRepository(isOrderRepositoryNull ? null : Mock.Of<IOrderRepository>())
                     .WithCreateOrderService(isCreateOrderServiceNull ? null : Mock.Of<ICreateOrderService>())
-                    .WithServiceRecipientRepository(isServiceRecipientRepositoryNull ? null : Mock.Of<IServiceRecipientRepository>())
                     .Build();
             }
 
@@ -231,24 +228,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [TestCase]
-        public async Task GetOrderSummaryAsync_ServiceRecipientRepository_CalledOnce()
-        {
-            var order = OrderBuilder.Create().Build();
-
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-            context.ServiceRecipientListCount = 2;
-
-            var controller = context.OrdersController;
-
-            string expectedOrderId = context.Order.OrderId;
-
-            await controller.GetOrderSummaryAsync(expectedOrderId);
-
-            context.ServiceRecipientRepositoryMock.Verify(x => x.GetCountByOrderIdAsync(expectedOrderId), Times.Once);
-        }
-
         [Test]
         public async Task CreateOrderAsync_CreateOrderSuccessfulResult_ReturnsOrderId()
         {
@@ -411,11 +390,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
-                ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
-                ServiceRecipientRepositoryMock
-                    .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<string>()))
-                    .ReturnsAsync(() => ServiceRecipientListCount);
-
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {
@@ -428,7 +402,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrdersController = OrdersControllerBuilder
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
-                    .WithServiceRecipientRepository(ServiceRecipientRepositoryMock.Object)
                     .WithCreateOrderService(CreateOrderServiceMock.Object)
                     .Build();
 
@@ -451,8 +424,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
-
-            internal Mock<IServiceRecipientRepository> ServiceRecipientRepositoryMock { get; }
 
             internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
 

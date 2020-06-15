@@ -15,15 +15,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private Contact _organisationContact;
         private DateTime _created;
         private DateTime _lastUpdated;
-        private readonly Guid _lastUpdatedBy;
-        private readonly string _lastUpdatedByName;
+        private Guid _lastUpdatedBy;
+        private string _lastUpdatedByName;
         private string _supplierId;
         private string _supplierName;
         private Address _supplierAddress;
         private Contact _supplierContact;
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
-        private readonly bool _catalogueSolutionsViewed;
+        private bool _catalogueSolutionsViewed;
 
         private OrderBuilder()
         {
@@ -109,6 +109,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrderBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        {
+            _catalogueSolutionsViewed = catalogueSolutionsViewed;
+            return this;
+        }
+
+        internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
+        {
+            _lastUpdatedBy = lastUpdatedBy;
+            return this;
+        }
+
+        public OrderBuilder WithLastUpdatedByName(string lastUpdatedByName)
+        {
+            _lastUpdatedByName = lastUpdatedByName;
+            return this;
+        }
+
         internal Order Build()
         {
             var descriptionResult = OrderDescription.Create(_orderDescription);
@@ -118,32 +136,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             order.OrderId = _orderId;
 
             order.ChangeOrderParty(
-                _organisationName, 
-                _organisationOdsCode, 
-                _organisationAddress, 
-                _organisationContact, 
-                _lastUpdatedBy, 
+                _organisationName,
+                _organisationOdsCode,
+                _organisationAddress,
+                _organisationContact,
+                _lastUpdatedBy,
                 _lastUpdatedByName);
 
             order.ChangeSupplier(
-                _supplierId, 
-                _supplierName, 
-                _supplierAddress, 
-                _supplierContact, 
-                _lastUpdatedBy, 
+                _supplierId,
+                _supplierName,
+                _supplierAddress,
+                _supplierContact,
+                _lastUpdatedBy,
                 _lastUpdatedByName);
 
             if (_commencementDate.HasValue)
-        {
+            {
                 order.ChangeCommencementDate(_commencementDate.Value, _lastUpdatedBy, _lastUpdatedByName);
-        }
+            }
 
             order.ServiceRecipientsViewed = _serviceRecipientsViewed;
 
             if (_catalogueSolutionsViewed)
-        {
+            {
                 order.MarkCatalogueSolutionsAsViewed(_lastUpdatedBy, _lastUpdatedByName);
-        }
+            }
 
             return order;
         }

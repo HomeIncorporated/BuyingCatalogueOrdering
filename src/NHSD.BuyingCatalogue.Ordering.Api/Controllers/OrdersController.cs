@@ -24,16 +24,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
-        private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
         public OrdersController(
             IOrderRepository orderRepository, 
-            ICreateOrderService createOrderService,
-            IServiceRecipientRepository serviceRecipientRepository)
+            ICreateOrderService createOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
-            _serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
@@ -77,8 +74,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
-
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
                 OrderId = orderId,
@@ -94,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel
                         .ServiceRecipients
                         .WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete")
-                        .WithCount(serviceRecipientsCount),
+                        .WithCount(order.ServiceRecipients.Count),
                     SectionModel.CatalogueSolutions.WithStatus(order.IsCatalogueSolutionsSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.AdditionalServices,
                     SectionModel.FundingSource
