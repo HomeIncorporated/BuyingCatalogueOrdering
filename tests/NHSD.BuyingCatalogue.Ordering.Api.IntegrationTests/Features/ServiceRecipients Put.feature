@@ -67,7 +67,7 @@ Scenario: 4. the user selects no services recipients all recipients are removed
     And the persisted service recipients are
         | OrderDescription | OdsCode | Name         |
         | Description 02   | Ods2    | Another Name |
-    And the order with Description Description 01 has catalogue solutions viewed set to false
+    And the order with description Description 01 has catalogue solutions viewed set to false
 
 @7412
 Scenario: 5. the user selects service recipients and the order is updated with the users details
@@ -82,10 +82,10 @@ Scenario: 5. the user selects service recipients and the order is updated with t
         | OrderDescription | OdsCode | Name                |
         | Description 02   | Ods2    | Another Name        |
         | Description 03   | Ods7    | Service Recipients2 |
-    And the order with Description Description 03 is updated in the database with data
+    And the order with description Description 03 is updated in the database with data
         | LastUpdatedByName | LastUpdatedBy                        |
         | Bob Smith         | 7B195137-6A59-4854-B118-62B39A3101EF |
-    And the order with Description Description 03 has LastUpdated time present and it is the current time
+    And the order with description Description 03 has LastUpdated time present and it is the current time
 
 @5350
 Scenario: 6. the user selects service recipients where ods codes are shared across orders
@@ -155,6 +155,6 @@ Scenario: 11. the user selects service recipients and the order marks the servic
         | OdsCode | Name                |
         | Ods7    | Service Recipients2 |
     Then a response with status code 204 is returned
-    And the order with Description Description 02 is updated in the database with data
+    And the order with description Description 02 is updated in the database with data
         | ServiceRecipientsViewed |
         | True                    |

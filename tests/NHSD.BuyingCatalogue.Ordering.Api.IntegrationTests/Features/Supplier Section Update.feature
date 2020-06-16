@@ -27,19 +27,19 @@ Scenario: 1. Update a supplier section
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 204 is returned
-    And the supplier address for order with Description Description 01 is
+    And the supplier address for order with description Description 01 is
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the supplier contact for order with Description Description 01 is
+    And the supplier contact for order with description Description 01 is
         | FirstName | LastName | Email                | Phone       |
         | Greg      | Smith    | Greg.smith@email.com | 23456234521 |
-    And the supplier for order with Description Description 01 is updated
+    And the supplier for order with description Description 01 is updated
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
-    And the order with Description Description 01 is updated in the database with data
+    And the order with description Description 01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description 01 has LastUpdated time present and it is the current time
+    And the order with description Description 01 has LastUpdated time present and it is the current time
 
 @4621
 Scenario: 2. Updating a supplier section with boundary values
@@ -54,19 +54,19 @@ Scenario: 2. Updating a supplier section with boundary values
         | Sup3       | Updated Supplier |
     Then a response with status code 204 is returned
     And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description 01
-    And the supplier address for order with Description Description 01 is
+    And the supplier address for order with description Description 01 is
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the supplier contact for order with Description Description 01 is
+    And the supplier contact for order with description Description 01 is
         | FirstName                | LastName                 | Email                         | Phone                   |
         | #A string of length 100# | #A string of length 100# | #A string of length 251#@.com | #A string of length 35# |
-    And the supplier for order with Description Description 01 is updated
+    And the supplier for order with description Description 01 is updated
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
-    And the order with Description Description 01 is updated in the database with data
+    And the order with description Description 01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description 01 has LastUpdated time present and it is the current time
+    And the order with description Description 01 has LastUpdated time present and it is the current time
 
 @4621
 Scenario: 3. Updating a supplier section, with a non existent model returns not found

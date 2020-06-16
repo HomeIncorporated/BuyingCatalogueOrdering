@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [When(@"the user makes a request to update the description on the order with Description (.*)")]
+        [When(@"the user makes a request to update the description on the order with description (.*)")]
         public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderId(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);

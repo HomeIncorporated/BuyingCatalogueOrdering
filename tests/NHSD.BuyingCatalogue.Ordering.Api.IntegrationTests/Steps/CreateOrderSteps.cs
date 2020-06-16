@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PostJsonAsync(_orderingUrl, data);
         }
 
-        [Then(@"a create order response is returned for Order with Description (.*)")]
+        [Then(@"a create order response is returned for order with description (.*)")]
         public async Task ThenTheCreateOrderResponseIsReturnedForOrderWithDescription(string description)
         {
             var order = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);

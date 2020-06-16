@@ -129,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orders.Count().Should().Be(0);
         }
 
-        [Then(@"the order with Description (.*) is updated in the database with data")]
+        [Then(@"the order with description (.*) is updated in the database with data")]
         public async Task ThenTheOrderIsUpdatedInTheDatabase(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -153,7 +153,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
 
-        [Then(@"the order with Description (.*) is updated and has a primary contact with data")]
+        [Then(@"the order with description (.*) is updated and has a primary contact with data")]
         public async Task ThenTheOrderWithOrderIdHasContactData(string descripton, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(descripton);
@@ -166,7 +166,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Then(@"the order with Description (.*) is updated and has a Organisation Address with data")]
+        [Then(@"the order with description (.*) is updated and has a Organisation Address with data")]
         public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -175,7 +175,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             table.CompareToInstance<AddressEntity>(actual);
         }
 
-        [Then(@"the order with Description (.*) has LastUpdated time present and it is the current time")]
+        [Then(@"the order with description (.*) has LastUpdated time present and it is the current time")]
         public async Task ThenOrderDescriptionHasLastUpdatedAtCurrentTime(string description)
         {
             var actual = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
@@ -190,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
-        [Then(@"the order with Description (.*) has Created time present and it is the current time")]
+        [Then(@"the order with description (.*) has Created time present and it is the current time")]
         public async Task ThenOrderDescriptionHasCreatedAtCurrentTime(string description)
         {
             var actual = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);

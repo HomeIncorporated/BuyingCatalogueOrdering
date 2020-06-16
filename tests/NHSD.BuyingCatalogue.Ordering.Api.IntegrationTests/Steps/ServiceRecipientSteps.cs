@@ -50,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [When(@"the user makes a request to retrieve the service-recipients section for order with Description (.*)")]
+        [When(@"the user makes a request to retrieve the service-recipients section for order with description (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

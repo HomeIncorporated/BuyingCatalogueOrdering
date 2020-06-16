@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             solutions.Should().BeEmpty();
         }
 
-        [Then(@"the order with Description (.*) has catalogue solutions viewed set to (true|false)")]
+        [Then(@"the order with description (.*) has catalogue solutions viewed set to (true|false)")]
         public async Task TheOrderWithIdHasCatalogueSolutionsViewedSet(string description, bool viewed)
         {
             var orderId = _context.GetOrderIdByDescription(description);

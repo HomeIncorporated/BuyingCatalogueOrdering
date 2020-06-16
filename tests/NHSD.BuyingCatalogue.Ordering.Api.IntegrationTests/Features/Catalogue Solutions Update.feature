@@ -13,11 +13,11 @@ Background:
 Scenario: 1. Update an orders catalogue solutions
     When the user makes a request to update the order catalogue solutions section with the Order Description Description 01
     Then a response with status code 204 is returned
-    And the order with Description Description 01 has catalogue solutions viewed set to true
-    And the order with Description Description 01 is updated in the database with data
+    And the order with description Description 01 has catalogue solutions viewed set to true
+    And the order with description Description 01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description 01 has LastUpdated time present and it is the current time
+    And the order with description Description 01 has LastUpdated time present and it is the current time
 
 @4631
 Scenario: 2. A non existent orderId returns not found

@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [Given(@"an order party update request exist for order with Description (.*)")]
+        [Given(@"an order party update request exist for order with description (.*)")]
         public void GivenAnOrderPartyUpdateRequestExistForOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             SetOrganisationPartyPayloadByOrderId(_context, orderId ?? -999, new OrganisationPartyPayload());
         }
 
-        [Given(@"the update request for order with Description (.*) has a contact")]
+        [Given(@"the update request for order with description (.*) has a contact")]
         public void GivenTheUpdateRequestForOrderDescriptionHasAContact(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [Given(@"the order party update request for order with Description (.*) has a address")]
+        [Given(@"the order party update request for order with description (.*) has a address")]
         public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [Given(@"the order party update request for order with Description (.*) has a Name of (.*)")]
+        [Given(@"the order party update request for order with description (.*) has a Name of (.*)")]
         public void GivenTheOrderPartyUpdateRequestForOrderDescriptionHasANameOfTestCareCenter(string description, string name)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [Given(@"the order party update request for order with Description (.*) has a OdsCode of (.*)")]
+        [Given(@"the order party update request for order with description (.*) has a OdsCode of (.*)")]
         public void GivenTheOrderPartyUpdateRequestForOrderDescriptionHasAOrganisationOdsCodeOfTestCareOds(string description, string odsCode)
         {
             var orderId = _context.GetOrderIdByDescription(description);

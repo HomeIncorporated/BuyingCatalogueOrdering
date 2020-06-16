@@ -37,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_orderCommencementDateUrl, orderId));
         }
         
-        [When(@"the user makes a request to retrieve the order commencement date section for the order with Description (.*)")]
+        [When(@"the user makes a request to retrieve the order commencement date section for the order with description (.*)")]
         public async Task WhenAGetRequestIsMadeForAnOrdersCommencementDateWithOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

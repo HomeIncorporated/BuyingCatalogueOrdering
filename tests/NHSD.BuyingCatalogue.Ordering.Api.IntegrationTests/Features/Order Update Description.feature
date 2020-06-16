@@ -12,7 +12,7 @@ Background:
 
 @5322
 Scenario: 1. Updating an orders description
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description    |
         | Description 03 |
     Then a response with status code 204 is returned
@@ -21,7 +21,7 @@ Scenario: 1. Updating an orders description
 
 @5322
 Scenario: 2. Updating an orders description and with a changed user name
-    When the user makes a request to update the description on the order with Description Description 02
+    When the user makes a request to update the description on the order with description Description 02
         | Description      |
         | Test Description |
     Then a response with status code 204 is returned
@@ -35,7 +35,7 @@ Scenario: 3. Updating an order, with a non existent model returns not found
 
 @5322
 Scenario: 4. Updating an order, with no description, returns a relevant error message
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description |
         | NULL        |
     Then a response with status code 400 is returned
@@ -45,7 +45,7 @@ Scenario: 4. Updating an order, with no description, returns a relevant error me
 
 @5322
 Scenario: 5. Updating an order, with a description, exceeding it's maximum limit, returns a relevant error message
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description              |
         | #A string of length 101# |
     Then a response with status code 400 is returned
@@ -56,7 +56,7 @@ Scenario: 5. Updating an order, with a description, exceeding it's maximum limit
 @5322
 Scenario: 6. If a user is not authorised, then they cannot update the orders description
     Given no user is logged in
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description         |
         | Another Description |
     Then a response with status code 401 is returned
@@ -64,7 +64,7 @@ Scenario: 6. If a user is not authorised, then they cannot update the orders des
 @5322
 Scenario: 7. A non buyer user cannot update an orders description
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description         |
         | Another Description |
     Then a response with status code 403 is returned
@@ -72,7 +72,7 @@ Scenario: 7. A non buyer user cannot update an orders description
 @5322
 Scenario: 8. A buyer user cannot update an orders description for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description         |
         | Another Description |
     Then a response with status code 403 is returned
@@ -80,7 +80,7 @@ Scenario: 8. A buyer user cannot update an orders description for an organisatio
 @5322
 Scenario: 9. A user with read only permissions, cannot update an orders description
     Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description         |
         | Another Description |
     Then a response with status code 403 is returned
@@ -88,14 +88,14 @@ Scenario: 9. A user with read only permissions, cannot update an orders descript
 @5322
 Scenario: 10. Service Failure
     Given the call to the database will fail
-    When the user makes a request to update the description on the order with Description Description 01
+    When the user makes a request to update the description on the order with description Description 01
         | Description         |
         | Another Description |
     Then a response with status code 500 is returned
 
 @5322
 Scenario: 11. Update order description to 100 characters should be successful
-    When the user makes a request to update the description on the order with Description Description 02
+    When the user makes a request to update the description on the order with description Description 02
         | Description              |
         | #A string of length 100# |
     Then a response with status code 204 is returned

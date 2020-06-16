@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), null);
         }
 
-        [Then(@"the supplier address for order with Description (.*) is")]
+        [Then(@"the supplier address for order with description (.*) is")]
         public async Task ThenTheSupplierAddressForOrderIs(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -151,7 +151,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(address);
         }
 
-        [Then(@"the supplier contact for order with Description (.*) is")]
+        [Then(@"the supplier contact for order with description (.*) is")]
         public async Task ThenTheSupplierContactIdContactForOrderIs(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -164,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(contact);
         }
 
-        [Then(@"the supplier for order with Description (.*) is updated")]
+        [Then(@"the supplier for order with description (.*) is updated")]
         public async Task ThenTheSupplierForOrderIsUpdated(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);

@@ -17,10 +17,10 @@ Scenario: 1. Updating an orders commencement date to be today
     Then a response with status code 204 is returned
     And the order commencement date for order with description Description01 is set to today
     And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description01
-    And the order with Description Description01 is updated in the database with data
+    And the order with description Description01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description01 has LastUpdated time present and it is the current time
+    And the order with description Description01 has LastUpdated time present and it is the current time
 
 @4619
 Scenario: 2. Updating an orders commencement date to be in the future
@@ -29,10 +29,10 @@ Scenario: 2. Updating an orders commencement date to be in the future
     Then a response with status code 204 is returned
     And the order commencement date for order with description Description01 is set to 59 days in the future
     And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description01
-    And the order with Description Description01 is updated in the database with data
+    And the order with description Description01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description01 has LastUpdated time present and it is the current time
+    And the order with description Description01 has LastUpdated time present and it is the current time
 
 @4619
 Scenario: 3. Updating an orders commencement date to be in the allowable past
@@ -41,10 +41,10 @@ Scenario: 3. Updating an orders commencement date to be in the allowable past
     Then a response with status code 204 is returned
     And the order commencement date for order with description Description01 is set to 59 days in the past
     And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description01
-    And the order with Description Description01 is updated in the database with data
+    And the order with description Description01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with Description Description01 has LastUpdated time present and it is the current time
+    And the order with description Description01 has LastUpdated time present and it is the current time
 
 @4619
 Scenario: 4. Updating an order, with no commencement date, returns a relevant error message
