@@ -12,7 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
     public sealed class OrderRepository : IOrderRepository
     {
-        public const string DefaultOrderId = "C000000-01";
         private readonly ApplicationDbContext _context;
 
         public OrderRepository(ApplicationDbContext context)
@@ -58,12 +57,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        //public async Task<string> GetLatestOrderIdByCreationDate()
-        //{
-        //    var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
-        //    return latestOrder?.OrderId;
-        //}
-
         public async Task<int> CreateOrderAsync(Order order)
         {
             if (order is null)
@@ -73,11 +66,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
             using (var dbContextTransaction = await _context.Database.BeginTransactionAsync())
             {
-                //if (order.OrderId == null)
-                //{
-                    //order.OrderId = await GetIncrementedOrderId();
-                //}
-
                 order.OrderStatus = await _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
 
                 _context.Order.Add(order);
@@ -87,18 +75,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
             return order.OrderId;
         }
-
-        //private async Task<string> GetIncrementedOrderId()
-        //{
-        //    var resultOrderId = DefaultOrderId;
-        //    var latestOrderId = await GetLatestOrderIdByCreationDate();
-        //    if (!string.IsNullOrEmpty(latestOrderId))
-        //    {
-        //        var numberSection = latestOrderId.Substring(1, 6);
-        //        var orderNumber = int.Parse(numberSection, CultureInfo.InvariantCulture);
-        //        resultOrderId = $"C{orderNumber + 1:D6}-01";
-        //    }
-        //    return resultOrderId;
-        //}
     }
 }
