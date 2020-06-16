@@ -52,7 +52,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var actual = await sut.CreateAsync(request);
 
             actual.IsSuccess.Should().BeTrue();
-            //actual.Value.Should().NotBeNull();
         }
 
         [Test]

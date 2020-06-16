@@ -11,7 +11,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             _order = new Order
             {
-                //OrderId = "C000014-01",
                 OrderId = 14,
                 OrganisationId = Guid.NewGuid(),
                 OrganisationName = "Organisation Name",

@@ -44,7 +44,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
         {
-            //var orderId = "C0000014-01";
             var orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
@@ -67,7 +66,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Get_OtherOrganisationId_ReturnsForbidden()
         {
-            //var orderId = "C0000014-01";
             var orderId = 14;
             var context = OrderDescriptionTestContext.Setup();
 
