@@ -151,13 +151,13 @@ Scenario: 6. Get the order summary that includes a list of service recipients
 @7412
 Scenario: 7. Get the order summary after the user has viewed the Catalogue Solutions section 
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | CatalogueSolutionsViewed |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+        | Description    | OrganisationId                       | CatalogueSolutionsViewed |
+        | Description 15 | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
+    When the user makes a request to retrieve the order summary for the order with the description Description 15
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | OrganisationId                       | Description    |
+        | 4af62b99-638c-4247-875e-965239cd0c48 | Description 15 |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |

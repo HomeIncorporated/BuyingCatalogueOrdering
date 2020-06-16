@@ -67,7 +67,7 @@ Scenario: 4. the user selects no services recipients all recipients are removed
     And the persisted service recipients are
         | OrderDescription | OdsCode | Name         |
         | Description 02   | Ods2    | Another Name |
-    And the order with ID C000014-01 has catalogue solutions viewed set to false
+    And the order with Description Description 01 has catalogue solutions viewed set to false
 
 @7412
 Scenario: 5. the user selects service recipients and the order is updated with the users details
@@ -89,28 +89,28 @@ Scenario: 5. the user selects service recipients and the order is updated with t
 
 @5350
 Scenario: 6. the user selects service recipients where ods codes are shared across orders
-    When the user makes a request to set the service-recipients section with order ID C000014-01
+    When the user makes a request to set the service-recipients section with order Description Description 01
         | OdsCode | Name                   |
-        | Ods2    | Description C000014-01 | 
+        | Ods2    | Name C000014-01 | 
     Then a response with status code 204 is returned
      And the persisted service recipients are
-        | OrderId    | OdsCode | Name                   |
-        | C000014-01 | Ods2    | Description C000014-01 |
-        | C000014-02 | Ods2    | Another Name           |
+        | OrderDescription | OdsCode | Name            |
+        | Description 01   | Ods2    | Name C000014-01 |
+        | Description 02   | Ods2    | Another Name    |
 
 @5350
 Scenario: 7. the user selects service recipients any removed recipients are only removed from the selected order
     Given Service Recipients exist
-        | OdsCode | Name         | OrderId    |
-        | Ods2    | Another Name | C000014-01 |
-    When the user makes a request to set the service-recipients section with order ID C000014-01
+        | OdsCode | Name         | OrderDescription |
+        | Ods2    | Another Name | Description 01   |
+    When the user makes a request to set the service-recipients section with order Description Description 01
         | OdsCode | Name                   |
-        | Ods3    | Description C000014-01 | 
+        | Ods3    | Name Order 1 | 
     Then a response with status code 204 is returned
      And the persisted service recipients are
-        | OrderId    | OdsCode | Name                   |
-        | C000014-01 | Ods3    | Description C000014-01 |
-        | C000014-02 | Ods2    | Another Name           |
+        | OrderDescription | OdsCode | Name         |
+        | Description 01   | Ods3    | Name Order 1 |
+        | Description 02   | Ods2    | Another Name |
 
 @7412
 Scenario: 8. If an order does not exist, return not found

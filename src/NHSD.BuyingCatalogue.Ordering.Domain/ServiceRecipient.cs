@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         public string OdsCode { get; set; }
 
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         [ForeignKey("OrderId")]
         public Order Order { get; set; }
