@@ -40,6 +40,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_orderSupplierSectionUrl, orderId));
         }
 
+        [When(@"the user makes a request to retrieve the order supplier section with the Order Description (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithOrderDescription(string description)
+        {
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull();
+            await _request.GetAsync(string.Format(_orderSupplierSectionUrl, orderId));
+        }
+
         [Then(@"the response contains the following supplier details")]
         public async Task ThenTheResponseContainsTheFollowingSupplierDetails(Table table)
         {
@@ -100,9 +108,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [When(@"the user makes a request to update the supplier with order ID (.*)")]
-        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderId(string orderId, Table table)
+        [When(@"the user makes a request to update the supplier with order Description (.*)")]
+        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderDescription(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
+
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
             
             _context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
@@ -119,18 +129,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
         }
 
-        [When(@"the user makes a request to update the supplier with order ID (.*) with no model")]
-        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string orderId)
+        [When(@"the user makes a request to update the supplier with order Description (.*) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string description)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), null);
         }
 
-        [Then(@"the supplier address for order (.*) is")]
-        public async Task ThenTheSupplierAddressForOrderIs(int orderId, Table table)
+        [Then(@"the supplier address for order with Description (.*) is")]
+        public async Task ThenTheSupplierAddressForOrderIs(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
+
             var address = table.CreateInstance<SupplierAddressTable>();
 
-            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString,(int)orderId))
                 .SupplierAddressId;
 
             var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, addressId);
@@ -138,21 +151,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(address);
         }
 
-        [Then(@"the supplier contact for order (.*) is")]
-        public async Task ThenTheSupplierContactIdContactForOrderIs(int orderId, Table table)
+        [Then(@"the supplier contact for order with Description (.*) is")]
+        public async Task ThenTheSupplierContactIdContactForOrderIs(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var contact = table.CreateInstance<SupplierContactTable>();
 
-            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, (int)orderId))
                 .SupplierContactId;
 
             var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, contactId);
             actual.Should().BeEquivalentTo(contact);
         }
 
-        [Then(@"the supplier for order (.*) is updated")]
-        public async Task ThenTheSupplierForOrderIsUpdated(int orderId, Table table)
+        [Then(@"the supplier for order with Description (.*) is updated")]
+        public async Task ThenTheSupplierForOrderIsUpdated(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var supplier = table.CreateInstance<SupplierSectionTable>();
 
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);

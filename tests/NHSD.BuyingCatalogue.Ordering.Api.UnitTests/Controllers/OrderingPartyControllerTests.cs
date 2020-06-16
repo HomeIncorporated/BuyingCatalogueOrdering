@@ -103,7 +103,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCase(null)]
-        [TestCase("INVALID")]
+        [TestCase(-999)]
         public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(int orderId)
         {
             var context = OrderingPartyTestContext.Setup();

@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
     {
         public string OdsCode { get; set; }
         public string Name { get; set; }
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         protected override string InsertSql => @"
             INSERT INTO dbo.ServiceRecipient

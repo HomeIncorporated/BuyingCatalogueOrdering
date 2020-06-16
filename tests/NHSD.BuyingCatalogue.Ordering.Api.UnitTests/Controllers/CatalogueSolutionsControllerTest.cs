@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
-            var result = await context.Controller.UpdateAsync("myOrder");
+            var result = await context.Controller.UpdateAsync(14);
             result.Should().BeOfType<NotFoundResult>();
         }
 
@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
-            var result = await context.Controller.UpdateAsync("myOrder");
+            var result = await context.Controller.UpdateAsync(14);
             result.Should().BeOfType<ForbidResult>();
         }
 
@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_ForExistingOrder_UpdatesCatalogueSolutionsViewed()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            var result = await context.Controller.UpdateAsync("myOrder");
+            var result = await context.Controller.UpdateAsync(14);
             result.Should().BeOfType<NoContentResult>();
             context.Order.CatalogueSolutionsViewed.Should().BeTrue();
         }
@@ -50,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
-            var result = await context.Controller.GetAllAsync("myOrder");
+            var result = await context.Controller.GetAllAsync(14);
             result.Value.Should().BeOfType<CatalogueSolutionsModel>();
             var model = result.Value;
             model.CatalogueSolutions.Should().BeEmpty();
@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
-            var result = await context.Controller.GetAllAsync("myOrder");
+            var result = await context.Controller.GetAllAsync(14);
             result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new NotFoundResult()));
         }
 
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
-            var result = await context.Controller.GetAllAsync("myOrder");
+            var result = await context.Controller.GetAllAsync(14);
             result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new ForbidResult()));
         }
 
@@ -88,7 +88,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
                 Order = new Order { OrganisationId = PrimaryOrganisationId };
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
                 OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {

@@ -16,9 +16,9 @@ Scenario: 1. Get all of the orders from an existing organisationId
     When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
     Then a response with status code 200 is returned
     And the orders list is returned with the following values
-        | OrderId | Description          | Status      | Created    | LastUpdated | LastUpdatedByName |
-        | 1       | OrdeID 1 Description | Submitted   | 11/05/2020 | 11/05/2020  | Bob Smith         |
-        | 2       | OrdeID 2 Description | Unsubmitted | 05/05/2020 | 09/05/2020  | Alice Smith       |
+        | Description          | Status      | Created    | LastUpdated | LastUpdatedByName |
+        | OrdeID 1 Description | Submitted   | 11/05/2020 | 11/05/2020  | Bob Smith         |
+        | OrdeID 2 Description | Unsubmitted | 05/05/2020 | 09/05/2020  | Alice Smith       |
 
 @4826
 Scenario: 2. Get all of the orders from an invalid organisationId

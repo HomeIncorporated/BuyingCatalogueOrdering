@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     {
         private string _odsCode;
         private readonly string _name;
-        private string _orderId;
+        private int _orderId;
 
         private ServiceRecipientBuilder()
         {
@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal ServiceRecipientBuilder WithOrderId(string orderId)
+        internal ServiceRecipientBuilder WithOrderId(int orderId)
         {
             _orderId = orderId;
             return this;

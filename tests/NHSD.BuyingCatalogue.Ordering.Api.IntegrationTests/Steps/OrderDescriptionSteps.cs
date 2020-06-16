@@ -59,11 +59,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [When(@"the user makes a request to update the description with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderId(string orderId, Table table)
+        [When(@"the user makes a request to update the description on the order with Description (.*)")]
+        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderId(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull();
             var data = table.CreateInstance<OrderDescriptionTable>();
 
+            _context.SetOrderIdByDescription(data.Description, (int) orderId);
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), data);
         }
 
@@ -82,9 +85,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
-        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, int orderId)
+        [Then(@"the order description (.*) is updated to (.*)")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsUpdatedTo(string preUpdateDescription, string postUpdateDescription)
         {
+            var originalOrderId = _context.GetOrderIdByDescription(preUpdateDescription);
+            originalOrderId.Should().NotBeNull("No stored mapping for given description");
+            var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, originalOrderId)).Description;
+            actual.Should().BeEquivalentTo(postUpdateDescription);
+        }
+
+        [Then(@"the order with description (.*) is set to")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(string preUpdateDescription, Table table)
+        {
+            var postUpdateDescription = table.CreateInstance<OrderDescriptionTable>().Description;
+            var originalOrderId = _context.GetOrderIdByDescription(preUpdateDescription);
+            originalOrderId.Should().NotBeNull("No stored mapping for given description");
+            var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, originalOrderId)).Description;
+            actual.Should().BeEquivalentTo(postUpdateDescription);
+        }
+
+
+
+        [Then(@"the lastUpdatedName is updated in the database to (.*) with Order Description (.*)")]
+        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string description)
+        {
+            var orderId = _context.GetOrderIdByDescription(description);
             var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).LastUpdatedByName;
             actual.Should().BeEquivalentTo(expected);
         }

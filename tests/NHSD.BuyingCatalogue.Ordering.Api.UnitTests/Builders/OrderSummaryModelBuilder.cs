@@ -6,14 +6,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrderSummaryModelBuilder
     {
-        private string _orderId;
+        private int _orderId;
         private readonly string _description;
         private Guid _organisationId;
         private IEnumerable<SectionModel> _sections;
 
         private OrderSummaryModelBuilder()
         {
-            _orderId = "C000014-01";
+            _orderId = 14;
             _description = "Some Description";
             _organisationId = Guid.NewGuid();
             _sections = SectionModelListBuilder.Create().Build();
@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return new OrderSummaryModelBuilder();
         }
 
-        public OrderSummaryModelBuilder WithOrderId(string orderId)
+        public OrderSummaryModelBuilder WithOrderId(int orderId)
         {
             _orderId = orderId;
             return this;

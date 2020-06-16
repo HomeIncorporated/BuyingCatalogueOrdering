@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 {
     public sealed class OrderSummaryModel
     {
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public Guid OrganisationId { get; set; }
 

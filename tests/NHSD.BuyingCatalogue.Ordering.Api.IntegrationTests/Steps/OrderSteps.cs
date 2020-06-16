@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -56,6 +57,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             IDictionary<string, int> orderDictionary = new Dictionary<string, int>();
 
+            if (_context.ContainsKey(ScenarioContextKeys.OrderMapDictionary))
+            {
+                orderDictionary = (IDictionary<string, int>) _context[ScenarioContextKeys.OrderMapDictionary];
+            }
+
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
                 int? organisationAddressId = _context.GetAddressIdByPostcode(ordersTableItem.OrganisationAddressPostcode);
@@ -112,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
 
-            orders.Should().BeEquivalentTo(expectedOrders);
+            orders.Should().BeEquivalentTo(expectedOrders,o=>o.Excluding(o=>o.OrderId));
         }
 
         [Then(@"an empty list is returned")]
@@ -122,12 +128,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orders.Count().Should().Be(0);
         }
 
-        [Then(@"the order with orderId (.*) is updated in the database with data")]
-        public async Task ThenTheOrderIsUpdatedInTheDatabase(int orderId, Table table)
+        [Then(@"the order with Description (.*) is updated in the database with data")]
+        public async Task ThenTheOrderIsUpdatedInTheDatabase(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             table.CompareToInstance(actual);
         }
+
 
         [Then(@"the order is created in the database with orderId (.*) and data")]
         public async Task ThenTheOrderIsCreatedInTheDatabase(int orderId, Table table)
@@ -144,9 +152,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
 
-        [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]
-        public async Task ThenTheOrderWithOrderIdHasContactData(int orderId, Table table)
+        [Then(@"the order with Description (.*) is updated and has a primary contact with data")]
+        public async Task ThenTheOrderWithOrderIdHasContactData(string descripton, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(descripton);
+
             var expected = table.CreateInstance<ContactEntity>();
 
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
@@ -155,19 +165,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
-        public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(int orderId, Table table)
+        [Then(@"the order with Description (.*) is updated and has a Organisation Address with data")]
+        public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string description, Table table)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, order.OrganisationAddressId);
             table.CompareToInstance<AddressEntity>(actual);
-        }
-
-        [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
-        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(int orderId)
-        {
-            var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
         [Then(@"the order with Description (.*) has LastUpdated time present and it is the current time")]

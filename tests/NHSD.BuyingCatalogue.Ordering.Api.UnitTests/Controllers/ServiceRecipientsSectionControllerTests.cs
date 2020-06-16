@@ -40,9 +40,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             });
         }
 
-        [TestCase(null)]
-        [TestCase("INVALID")]
-        public async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
+        [TestCase(-999)]
+        public async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(int orderId)
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = null;
@@ -57,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = ServiceRecipientsTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
 
-            var response = await context.Controller.GetAllAsync("myOrder");
+            var response = await context.Controller.GetAllAsync(14);
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(new ForbidResult()));
         }
 
@@ -70,7 +69,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 ServiceRecipients = new List<ServiceRecipientModel>()
             };
 
-            var response = await context.Controller.GetAllAsync("myOrder");
+            var response = await context.Controller.GetAllAsync(14);
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
         }
 
@@ -79,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
@@ -105,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            const string orderId = "C0000014-01";
+            const int orderId = 14;
 
             context.Order = OrderBuilder.Create().WithOrderId(orderId).WithOrganisationId(context.PrimaryOrganisationId).Build();
 
@@ -132,16 +131,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            await context.Controller.GetAllAsync(string.Empty);
+            await context.Controller.GetAllAsync(-999);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
-            context.ServiceRecipientRepositoryMock.Verify(x => x.ListServiceRecipientsByOrderIdAsync(string.Empty),
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(-999), Times.Once);
+            context.ServiceRecipientRepositoryMock.Verify(x => x.ListServiceRecipientsByOrderIdAsync(-999),
                 Times.Once);
         }
 
         [TestCase(null)]
-        [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
+        [TestCase(-999)]
+        public async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(int orderId)
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = null;
@@ -156,7 +155,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = ServiceRecipientsTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
 
-            var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
+            var response = await context.Controller.UpdateAsync(14, DefaultServiceRecipientsModel);
             response.Should().BeEquivalentTo(new ForbidResult());
         }
 
@@ -234,7 +233,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            string expectedOrderId = context.Order.OrderId;
+            int expectedOrderId = context.Order.OrderId;
             await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(expectedOrderId), Times.Once);
@@ -245,7 +244,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            string expectedOrderId = context.Order.OrderId;
+            int expectedOrderId = context.Order.OrderId;
             await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
 
             context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
@@ -263,7 +262,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
-            CreateServiceRecipientData(string odsCode, string orderId)
+            CreateServiceRecipientData(string odsCode, int orderId)
         {
             var serviceRecipient = ServiceRecipientBuilder
                 .Create()
@@ -286,11 +285,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Order = new Order { OrganisationId = PrimaryOrganisationId };
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<int>())).ReturnsAsync(() => Order);
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipients = new List<ServiceRecipient>();
-                ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderIdAsync(It.IsAny<string>()))
+                ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderIdAsync(It.IsAny<int>()))
                     .ReturnsAsync(() => ServiceRecipients);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]

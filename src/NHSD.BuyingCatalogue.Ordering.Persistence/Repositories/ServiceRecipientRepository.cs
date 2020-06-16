@@ -18,33 +18,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId)
+        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(int orderId)
         {
             return await _context.ServiceRecipient
                 .Include(x => x.Order)
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
-        public async Task<int> GetCountByOrderIdAsync(string orderId)
+        public async Task<int> GetCountByOrderIdAsync(int orderId)
         {
-            if (orderId is null)
-            {
-                throw new ArgumentNullException(nameof(orderId));
-            }
-
             return await _context.ServiceRecipient
                 .Where(x => x.Order.OrderId == orderId)
                 .CountAsync();
         }
         
-        public async Task DeleteAllByOrderId(string orderId)
-        {
-            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
-            _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
+        public async Task UpdateAsync(int orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
         {
             if (recipientsUpdates == null)
             {

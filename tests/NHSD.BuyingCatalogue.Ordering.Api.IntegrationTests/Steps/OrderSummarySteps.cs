@@ -32,16 +32,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context = context;
         }
 
-        //[When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
-        //public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
-        //{
-        //    await _request.GetAsync(string.Format(_orderSummaryUrl, orderId));
-        //}
+        [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
+        {
+            
+            await _request.GetAsync(string.Format(_orderSummaryUrl, orderId=="INVALID"?"-999": orderId));
+        }
 
         [When(@"the user makes a request to retrieve the order summary for the order with the description (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string description)
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithOrderDescription(string description)
         {
-            var orderId = OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description).Id;
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull();
             await _request.GetAsync(string.Format(_orderSummaryUrl, orderId));
         }
 

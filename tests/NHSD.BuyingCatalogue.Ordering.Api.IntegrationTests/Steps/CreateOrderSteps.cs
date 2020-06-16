@@ -3,6 +3,7 @@ using FluentAssertions;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -33,11 +34,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PostJsonAsync(_orderingUrl, data);
         }
 
-        [Then(@"a create order response is returned with the OrderId (.*)")]
-        public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(string orderId)
+        //[Then(@"a create order response is returned with the OrderId (.*)")]
+        //public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(string orderId)
+        //{
+        //    var responseOrderId = (await _response.ReadBodyAsJsonAsync()).Value<string>("orderId");
+        //    orderId.Should().Be(responseOrderId);
+       // }
+        
+
+        [Then(@"a create order response is returned for Order with Description (.*)")]
+        public async Task ThenTheCreateOrderResponseIsReturnedForOrderWithDescription(string description)
         {
+            var order = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
+            order.Should().NotBeNull();
             var responseOrderId = (await _response.ReadBodyAsJsonAsync()).Value<string>("orderId");
-            orderId.Should().Be(responseOrderId);
+            order.OrderId.Should().Be(responseOrderId);
         }
 
         private sealed class CreateOrderPayload

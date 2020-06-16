@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
@@ -19,15 +20,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response _response;
         private readonly Request _request;
         private readonly Settings _settings;
-
+        private readonly ScenarioContext _context;
         private readonly string _serviceRecipientUrl;
 
-        public ServiceRecipientSteps(Response response, Request request, Settings settings)
+        public ServiceRecipientSteps(Response response, Request request, Settings settings ,ScenarioContext context)
         {
             _response = response;
             _request = request;
             _settings = settings;
-
+            _context = context;
             _serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/service-recipients";
         }
 
@@ -36,26 +37,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             foreach (var serviceRecipientItem in table.CreateSet<ServiceRecipientTable>())
             {
+                var orderId = _context.GetOrderIdByDescription(serviceRecipientItem.OrderDescription);
+                orderId.Should().NotBeNull();
                 var serviceRecipient = ServiceRecipientBuilder
                     .Create()
                     .WithOdsCode(serviceRecipientItem.OdsCode)
                     .WithName(serviceRecipientItem.Name)
-                    .WithOrderId(serviceRecipientItem.OrderId)
+                    .WithOrderId((int)orderId)
                     .Build();
 
                 await serviceRecipient.InsertAsync(_settings.ConnectionString);
             }
         }
 
-        [When(@"the user makes a request to retrieve the service-recipients section with order ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId)
+        [When(@"the user makes a request to retrieve the service-recipients section for order with Description (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderDescription(string description)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull();
             await _request.GetAsync(string.Format(_serviceRecipientUrl, orderId));
         }
 
-        [When(@"the user makes a request to set the service-recipients section with order ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
+
+        [When(@"the user makes a request to retrieve the service-recipients section with unknown orderId")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithUnknownOrderID()
         {
+            await _request.GetAsync(string.Format(_serviceRecipientUrl, -999));
+        }
+
+        [When(@"the user makes a request to set the service-recipients section with order Description (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string description, Table table)
+        {
+            var orderId = _context.GetOrderIdByDescription(description);
             var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
             await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId),payload);
         }
@@ -70,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var serviceRecipients = (await _response.ReadBodyAsJsonAsync()).SelectToken("serviceRecipients").Select(CreateServiceRecipients);
 
-            expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderId));
+            expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderDescription));
         }
 
         [Then(@"the persisted service recipients are")]
@@ -78,7 +91,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
             var actual = await ServiceRecipientEntity.FetchAllServiceRecipients(_settings.ConnectionString);
-            expected.Should().BeEquivalentTo(actual);
+            var expectedWithOrderIds = expected.Select(s => new
+            {
+                OrderId = _context.GetOrderIdByDescription(s.OrderDescription), 
+                OdsCode = s.OdsCode,
+                Name = s.Name
+            });
+            expectedWithOrderIds.Should().BeEquivalentTo(actual);
         }
 
         private sealed class ServiceRecipientsTable
@@ -99,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             public string OdsCode { get; set; }
             public string Name { get; set; }
-            public string OrderId { get; set; }
+            public string OrderDescription { get; set; }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -33,6 +34,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the order commencement date section with the ID (.*)")]
         public async Task WhenAGetRequestIsMadeForAnOrdersCommencementDateWithOrderId(string orderId)
         {
+            await _request.GetAsync(string.Format(_orderCommencementDateUrl, orderId));
+        }
+        
+        [When(@"the user makes a request to retrieve the order commencement date section for the order with Description (.*)")]
+        public async Task WhenAGetRequestIsMadeForAnOrdersCommencementDateWithOrderDescription(string description)
+        {
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull();
             await _request.GetAsync(string.Format(_orderCommencementDateUrl, orderId));
         }
 
@@ -75,35 +84,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context["CommencementDate"] = DateTime.Now + TimeSpan.FromDays(days);
         }
 
-        [When(@"the user makes a request to update the commencement date with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToUpdateTheCommencementDateWithOrderId(string orderId)
+        [When(@"the user makes a request to update the commencement date with the Order Description (.*)")]
+        public async Task WhenTheUserMakesARequestToUpdateTheCommencementDateWithOrderDescription(string description)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
+            orderId.Should().NotBeNull("Cannot map description to order");
             _context.ContainsKey("CommencementDate").Should()
                 .BeTrue("Commencement Date should have been set via the 'Given the user sets the commencement date' steps");
             var date = _context["CommencementDate"] as DateTime?;
             await _request.PutJsonAsync(string.Format(_orderCommencementDateUrl, orderId),
-                new {commencementDate = date});
+                new { commencementDate = date });
         }
 
-        [Then(@"the order commencement date for order with id (.*) is set to today")]
-        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToToday(int orderId)
+
+        [Then(@"the order commencement date for order with description (.*) is set to today")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToToday(string description)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.CommencementDate.HasValue.Should().BeTrue();
             actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date);
         }
 
-        [Then(@"the order commencement date for order with id (.*) is set to ([0-9]+) days in the future")]
-        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysInTheFuture(int orderId, int days)
+        [Then(@"the order commencement date for order with description (.*) is set to ([0-9]+) days in the future")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysInTheFuture(string description, int days)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.CommencementDate.HasValue.Should().BeTrue();
             actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date + TimeSpan.FromDays(days));
         }
 
-        [Then(@"the order commencement date for order with id (.*) is set to ([0-9]+) days in the past")]
-        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysAgo(int orderId, int days)
+
+        [Then(@"the order commencement date for order with description (.*) is set to ([0-9]+) days in the past")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysAgo(string description, int days)
         {
+            var orderId = _context.GetOrderIdByDescription(description);
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.CommencementDate.HasValue.Should().BeTrue();
             actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date - TimeSpan.FromDays(days));

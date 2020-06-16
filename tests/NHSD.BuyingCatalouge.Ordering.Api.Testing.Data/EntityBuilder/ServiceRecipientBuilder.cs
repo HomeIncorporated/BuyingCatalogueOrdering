@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
     {
         private string _odsCode;
         private string _name;
-        private string _orderId;
+        private int _orderId;
 
         private ServiceRecipientBuilder()
         {
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
-        public ServiceRecipientBuilder WithOrderId(string orderId)
+        public ServiceRecipientBuilder WithOrderId(int orderId)
         {
             _orderId = orderId;
             return this;

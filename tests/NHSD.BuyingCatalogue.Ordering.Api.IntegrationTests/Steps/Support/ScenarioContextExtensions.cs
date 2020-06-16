@@ -63,5 +63,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
 
             return null;
         }
+
+        public static void SetOrderIdByDescription(this ScenarioContext context, string description, int orderId)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (description == null)
+                return;
+
+            var OrderMapDictionary =
+                context.Get<IDictionary<string, int>>(ScenarioContextKeys.OrderMapDictionary, new Dictionary<string, int>());
+
+            OrderMapDictionary[description] = orderId;
+
+            if (!context.ContainsKey(ScenarioContextKeys.OrderMapDictionary))
+            {
+                context[ScenarioContextKeys.OrderMapDictionary] = OrderMapDictionary;
+            }
+        }
     }
 }

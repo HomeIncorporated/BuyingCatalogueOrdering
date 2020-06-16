@@ -137,7 +137,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            var response = await controller.GetOrderSummaryAsync(InvalidOrderId);
+            var response = await controller.GetOrderSummaryAsync(-999);
             response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new NotFoundResult()));
         }
 
@@ -207,7 +207,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            string expectedOrderId = context.Order.OrderId;
+            int expectedOrderId = context.Order.OrderId;
 
             var response = (await controller.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
             Assert.IsNotNull(response);
@@ -242,7 +242,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            string expectedOrderId = context.Order.OrderId;
+            int expectedOrderId = context.Order.OrderId;
 
             await controller.GetOrderSummaryAsync(expectedOrderId);
 
@@ -371,7 +371,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedSummary: new OrderSummaryModel
                 {
-                    OrderId = repositoryOrder.OrderId.ToString(),
+                    OrderId = repositoryOrder.OrderId,
                     OrganisationId = repositoryOrder.OrganisationId,
                     Description = repositoryOrder.Description.Value,
                     Sections = new List<SectionModel>
@@ -413,7 +413,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipientRepositoryMock
-                    .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<string>()))
+                    .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<int>()))
                     .ReturnsAsync(() => ServiceRecipientListCount);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(

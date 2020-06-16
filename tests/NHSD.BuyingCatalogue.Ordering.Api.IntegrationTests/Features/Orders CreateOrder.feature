@@ -13,24 +13,24 @@ Scenario: 1. A user can create a order and data is persisted to the database;
         | 4af62b99-638c-4247-875e-965239cd0c48 | Order1Description |
     Then a response with status code 201 is returned
     And the order is created in the database with Description Order1Description and data
-        | OrderId | Description       | OrderStatusId | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
-        | 1       | Order1Description | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+        | Description       | OrderStatusId | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
+        | Order1Description | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
     And the order with Description Order1Description has LastUpdated time present and it is the current time
     And the order with Description Order1Description has Created time present and it is the current time
 
 @6739
 Scenario: 2. A user creates an order when existing orders are present, The order is created with a incremented orderId
     Given Orders exist
-        | Description      | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
+        | Description         | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
         | OrderId1Description | 1             | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
     When a POST request is made to create an order
         | OrganisationId                       | Description      |
         | 4af62b99-638c-4247-875e-965239cd0c48 | SomeDescription2 |
     Then a response with status code 201 is returned
-    And a create order response is returned with the OrderId 2
+    And a create order response is returned for Order with Description SomeDescription2
     And the order is created in the database with Description SomeDescription2 and data
-        | OrderId | Description      | OrderStatusId | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
-        | 2       | SomeDescription2 | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+        | Description      | OrderStatusId | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
+        | SomeDescription2 | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
     And the order with Description SomeDescription2 has LastUpdated time present and it is the current time
     And the order with Description SomeDescription2 has Created time present and it is the current time
 
@@ -46,7 +46,7 @@ Scenario: 3. A user creates mutiple orders and order id is incremented multiple 
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 3 |
     Then a response with status code 201 is returned
-    And a create order response is returned with the OrderId 3
+    And a create order response is returned for Order with Description This is an order for organisation 3
 
 @6739
 Scenario: 4. A user can create a order when no orders exist and a defualt OrderId is returned;
@@ -54,7 +54,7 @@ Scenario: 4. A user can create a order when no orders exist and a defualt OrderI
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
     Then a response with status code 201 is returned
-    And a create order response is returned with the OrderId 1
+    And a create order response is returned for Order with Description This is an order for organisation 2
 
 @6739
 Scenario: 5. A user creates an order without specifing an Organisation Id a Status Code of 403 is returned

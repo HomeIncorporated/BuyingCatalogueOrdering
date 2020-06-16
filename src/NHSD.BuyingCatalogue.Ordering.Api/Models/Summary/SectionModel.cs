@@ -4,15 +4,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 {
     public sealed class SectionModel
     {
-        internal static SectionModel Description => new SectionModel("description", "complete");
-        internal static SectionModel OrderingParty => new SectionModel("ordering-party");
-        internal static SectionModel Supplier => new SectionModel("supplier");
-        internal static SectionModel CommencementDate => new SectionModel("commencement-date");
-        internal static SectionModel AssociatedServices => new SectionModel("associated-services");
-        internal static SectionModel ServiceRecipients => new SectionModel("service-recipients");
-        internal static SectionModel CatalogueSolutions => new SectionModel("catalogue-solutions");
-        internal static SectionModel AdditionalServices => new SectionModel("additional-services");
-        internal static SectionModel FundingSource => new SectionModel("funding-source");
+        public static SectionModel Description => new SectionModel("description", "complete");
+        public static SectionModel OrderingParty => new SectionModel("ordering-party");
+        public static SectionModel Supplier => new SectionModel("supplier");
+        public static SectionModel CommencementDate => new SectionModel("commencement-date");
+        public static SectionModel AssociatedServices => new SectionModel("associated-services");
+        public static SectionModel ServiceRecipients => new SectionModel("service-recipients");
+        public static SectionModel CatalogueSolutions => new SectionModel("catalogue-solutions");
+        public static SectionModel AdditionalServices => new SectionModel("additional-services");
+        public static SectionModel FundingSource => new SectionModel("funding-source");
 
         public string Id { get; }
 

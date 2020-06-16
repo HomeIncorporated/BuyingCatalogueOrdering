@@ -11,8 +11,8 @@ Background:
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     Given Orders exist
-        | OrderId    | OrganisationId                       | OrganisationName | OrganisationOdsCode | SupplierId | SupplierAddressPostcode | SupplierContactEmail    | Description      | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        |
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | SupId      | LS 1 3AP                | Fred.robinson@email.com | Some Description | 1             | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+        | OrderId    | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | SupplierId | SupplierAddressPostcode | SupplierContactEmail    | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        |
+        | C000014-01 | Description01 | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | SupId      | LS 1 3AP                | Fred.robinson@email.com | 1             | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4621
@@ -23,7 +23,7 @@ Scenario: 1. Updating a supplier section with not filling in required fields pro
     And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress | TelephoneNumber |
         | NULL      | NULL     | NULL         | NULL            |
-    When the user makes a request to update the supplier with order ID C000014-01
+    When the user makes a request to update the supplier with order Description Description01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 400 is returned
@@ -42,7 +42,7 @@ Scenario: 2. Updating a supplier section, and exceeding the maxLength fields, pr
     And the user wants to update the supplier contact section
         | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
         | #A string of length 101# | #A string of length 101# | #A string of length 252#@.com | #A string of length 36# |
-    When the user makes a request to update the supplier with order ID C000014-01
+    When the user makes a request to update the supplier with order Description Description01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 400 is returned
@@ -61,7 +61,7 @@ Scenario: 3. Updating a supplier section, and not providing a correct email addr
     And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress   | TelephoneNumber |
         | Greg      | Smith    | <EmailAddress> | 23456234521     |
-    When the user makes a request to update the supplier with order ID C000014-01
+    When the user makes a request to update the supplier with order Description Description01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 400 is returned

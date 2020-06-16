@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.CommencementDate = commencementDate;
-            var result = await context.Controller.GetAsync("myOrder");
+            var result = await context.Controller.GetAsync(14);
             result.Should().BeOfType<OkObjectResult>();
 
             var okResult = result as OkObjectResult;
@@ -87,7 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = null;
-            var result = await context.Controller.GetAsync("myOrder");
+            var result = await context.Controller.GetAsync(14);
             result.Should().BeOfType<NotFoundResult>();
         }
 
@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
             context.Order.CommencementDate = DateTime.Now;
-            var result = await context.Controller.GetAsync("myOrder");
+            var result = await context.Controller.GetAsync(14);
             result.Should().BeOfType<ForbidResult>();
         }
 

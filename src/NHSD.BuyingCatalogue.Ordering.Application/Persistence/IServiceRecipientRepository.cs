@@ -6,10 +6,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
 {
     public interface IServiceRecipientRepository
     {
-        Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId);
+        Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(int orderId);
         
-        Task<int> GetCountByOrderIdAsync(string orderId);
+        Task<int> GetCountByOrderIdAsync(int orderId);
         
-        Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates);
+        Task UpdateAsync(int orderId, IEnumerable<ServiceRecipient> recipientsUpdates);
     }
 }

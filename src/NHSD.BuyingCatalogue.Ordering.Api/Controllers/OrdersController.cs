@@ -81,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
-                OrderId = ""+orderId,
+                OrderId = orderId,
                 OrganisationId = order.OrganisationId,
                 Description = order.Description.Value,
                 Sections = new List<SectionModel>

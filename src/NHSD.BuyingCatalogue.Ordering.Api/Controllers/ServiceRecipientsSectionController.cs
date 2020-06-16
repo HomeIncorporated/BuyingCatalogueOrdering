@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(int orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> UpdateAsync(int orderId, ServiceRecipientsModel model)
         {
             if (model is null)
             {
