@@ -77,7 +77,7 @@ Scenario: 2. Updating an ordering party with boundary values results in persiste
 
 @4616
 Scenario: 3. Updating an ordering party, with a non existent model returns not found
-    When the user makes a request to update the order party with order Description Description 01 with no model
+    When the user makes a request to update the order party for order with description Description 01 with no model
     Then a response with status code 400 is returned
 
 @4616
@@ -115,5 +115,5 @@ Scenario: 7. A user with read only permissions, cannot update an ordering-party
 @4616
 Scenario: 8. Service Failure
     Given the call to the database will fail
-    When the user makes a request to retrieve the ordering-party section with the Order Description Description 01
+    When the user makes a request to retrieve the ordering-party section for the order with description Description 01
     Then a response with status code 500 is returned

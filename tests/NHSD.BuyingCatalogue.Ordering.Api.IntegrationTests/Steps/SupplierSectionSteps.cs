@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_orderSupplierSectionUrl, orderId));
         }
 
-        [When(@"the user makes a request to retrieve the order supplier section with the Order Description (.*)")]
+        [When(@"the user makes a request to retrieve the order supplier section for the order with description (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -108,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [When(@"the user makes a request to update the supplier with order Description (.*)")]
+        [When(@"the user makes a request to update the supplier for order with description (.*)")]
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderDescription(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -129,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
         }
 
-        [When(@"the user makes a request to update the supplier with order Description (.*) with no model")]
+        [When(@"the user makes a request to update the supplier for order with description (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

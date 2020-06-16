@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_orderCatalogueSolutionsUrl, orderId));
         }
 
-        [When(@"the user makes a request to retrieve the order catalogue solutions section with the Order Description (.*)")]
+        [When(@"the user makes a request to retrieve the order catalogue solutions section for the order with description (.*)")]
         public async Task WhenAGetRequestIsMadeForAnOrdersCatalogueSolutionsWithOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);
@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
 
-        [When(@"the user makes a request to update the order catalogue solutions section with the Order Description (.*)")]
+        [When(@"the user makes a request to update the order catalogue solutions section for the order with description (.*)")]
         public async Task WhenAPutRequestIsMadeForAnOrdersCatalogueSolutionsWithOrderId(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_serviceRecipientUrl, -999));
         }
 
-        [When(@"the user makes a request to set the service-recipients section with order Description (.*)")]
+        [When(@"the user makes a request to set the service-recipients section for order with description (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string description, Table table)
         {
             var orderId = _context.GetOrderIdByDescription(description);

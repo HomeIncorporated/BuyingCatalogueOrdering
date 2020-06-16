@@ -121,7 +121,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [When(@"the user makes a request to retrieve the ordering-party section with the Order Description (.*)")]
+        [When(@"the user makes a request to retrieve the ordering-party section for the order with description (.*)")]
         public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheOrderDescription(string description)
         {
             var orderId  =_context.GetOrderIdByDescription(description);
@@ -148,7 +148,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [When(@"the user makes a request to update the order party with order Description (.*) with no model")]
+        [When(@"the user makes a request to update the order party for order with description (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderIdWithNoModel(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

@@ -17,7 +17,7 @@ Scenario: 1. Updating an orders description
         | Description 03 |
     Then a response with status code 204 is returned
     And the order description Description 01 is updated to Description 03 
-    And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description 03
+    And the lastUpdatedName is updated in the database to Bob Smith for order with description Description 03
 
 @5322
 Scenario: 2. Updating an orders description and with a changed user name
@@ -26,7 +26,7 @@ Scenario: 2. Updating an orders description and with a changed user name
         | Test Description |
     Then a response with status code 204 is returned
     And the order description Description 02 is updated to Test Description
-    And the lastUpdatedName is updated in the database to Bob Smith with Order Description Test Description
+    And the lastUpdatedName is updated in the database to Bob Smith for order with description Test Description
 
 @5322
 Scenario: 3. Updating an order, with a non existent model returns not found

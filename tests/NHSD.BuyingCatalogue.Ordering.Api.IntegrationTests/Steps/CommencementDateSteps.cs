@@ -84,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context["CommencementDate"] = DateTime.Now + TimeSpan.FromDays(days);
         }
 
-        [When(@"the user makes a request to update the commencement date with the Order Description (.*)")]
+        [When(@"the user makes a request to update the commencement date for the order with description (.*)")]
         public async Task WhenTheUserMakesARequestToUpdateTheCommencementDateWithOrderDescription(string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
 
 
-        [Then(@"the lastUpdatedName is updated in the database to (.*) with Order Description (.*)")]
+        [Then(@"the lastUpdatedName is updated in the database to (.*) for order with description (.*)")]
         public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string description)
         {
             var orderId = _context.GetOrderIdByDescription(description);

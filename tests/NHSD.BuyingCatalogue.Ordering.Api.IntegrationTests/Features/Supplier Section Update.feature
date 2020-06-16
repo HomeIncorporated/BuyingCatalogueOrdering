@@ -23,7 +23,7 @@ Scenario: 1. Update a supplier section
     And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress         | TelephoneNumber |
         | Greg      | Smith    | Greg.smith@email.com | 23456234521     |
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 204 is returned
@@ -49,11 +49,11 @@ Scenario: 2. Updating a supplier section with boundary values
     And the user wants to update the supplier contact section
         | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
         | #A string of length 100# | #A string of length 100# | #A string of length 251#@.com | #A string of length 35# |
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 204 is returned
-    And the lastUpdatedName is updated in the database to Bob Smith with Order Description Description 01
+    And the lastUpdatedName is updated in the database to Bob Smith for order with description Description 01
     And the supplier address for order with description Description 01 is
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
@@ -70,13 +70,13 @@ Scenario: 2. Updating a supplier section with boundary values
 
 @4621
 Scenario: 3. Updating a supplier section, with a non existent model returns not found
-    When the user makes a request to update the supplier with order Description Description 01 with no model
+    When the user makes a request to update the supplier for order with description Description 01 with no model
     Then a response with status code 400 is returned
 
 @4621
 Scenario: 4. If a user is not authorised, then they cannot update the supplier
     Given no user is logged in
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 401 is returned
@@ -84,7 +84,7 @@ Scenario: 4. If a user is not authorised, then they cannot update the supplier
 @4621
 Scenario: 5. A non buyer user cannot update the supplier section
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 403 is returned
@@ -92,7 +92,7 @@ Scenario: 5. A non buyer user cannot update the supplier section
 @4621
 Scenario: 6. A buyer user cannot update a supplier section for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 403 is returned
@@ -100,7 +100,7 @@ Scenario: 6. A buyer user cannot update a supplier section for an organisation t
 @4621
 Scenario: 7. A user with read only permissions cannot update a supplier section
     Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 403 is returned
@@ -108,7 +108,7 @@ Scenario: 7. A user with read only permissions cannot update a supplier section
 @4621
 Scenario: 8. Service Failure
     Given the call to the database will fail
-    When the user makes a request to update the supplier with order Description Description 01
+    When the user makes a request to update the supplier for order with description Description 01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 500 is returned
