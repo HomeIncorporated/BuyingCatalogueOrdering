@@ -78,7 +78,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
                 var order = OrderEntityBuilder
                     .Create()
-
                     .WithDescription(ordersTableItem.Description)
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)

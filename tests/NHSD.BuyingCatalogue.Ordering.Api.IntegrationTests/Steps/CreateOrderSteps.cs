@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var order = await OrderEntity.FetchOrderByDescription(_settings.ConnectionString, description);
             order.Should().NotBeNull();
-            var responseOrderId = (await _response.ReadBodyAsJsonAsync()).Value<string>("orderId");
+            var responseOrderId = (await _response.ReadBodyAsJsonAsync()).Value<int>("orderId");
             order.OrderId.Should().Be(responseOrderId);
         }
 

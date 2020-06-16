@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return new OrderEntityBuilder();
         }
 
-        public OrderEntityBuilder WithOrderId(string orderId)
+        public OrderEntityBuilder WithOrderId(int orderId)
         {
             _orderEntity.OrderId = orderId;
             return this;

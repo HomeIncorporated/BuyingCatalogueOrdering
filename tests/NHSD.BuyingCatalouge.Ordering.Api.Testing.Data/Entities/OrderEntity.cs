@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class OrderEntity : EntityBase
     {
-        public string OrderId { get; set; }
+        public int? OrderId { get; set; }
 
         public string Description { get; set; }
 
