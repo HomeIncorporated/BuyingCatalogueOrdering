@@ -34,14 +34,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PostJsonAsync(_orderingUrl, data);
         }
 
-        //[Then(@"a create order response is returned with the OrderId (.*)")]
-        //public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(string orderId)
-        //{
-        //    var responseOrderId = (await _response.ReadBodyAsJsonAsync()).Value<string>("orderId");
-        //    orderId.Should().Be(responseOrderId);
-       // }
-        
-
         [Then(@"a create order response is returned for Order with Description (.*)")]
         public async Task ThenTheCreateOrderResponseIsReturnedForOrderWithDescription(string description)
         {
