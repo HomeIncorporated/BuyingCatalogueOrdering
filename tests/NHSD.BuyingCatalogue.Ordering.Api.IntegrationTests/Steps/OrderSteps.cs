@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
                 var order = OrderEntityBuilder
                     .Create()
-                     //.WithOrderId(ordersTableItem.OrderId)
+
                     .WithDescription(ordersTableItem.Description)
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)
@@ -92,6 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
                     .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
                     .WithServiceRecipientsViewed(ordersTableItem.ServiceRecipientsViewed)
+                    .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -264,6 +265,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime CommencementDate { get; set; }
 
             public bool ServiceRecipientsViewed { get; set; }
+
+            public bool CatalogueSolutionsViewed { get; set; }
         }
     }
 }
