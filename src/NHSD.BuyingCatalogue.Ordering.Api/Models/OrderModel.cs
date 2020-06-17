@@ -4,7 +4,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderModel
     {
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public string Description { get; set; }
 

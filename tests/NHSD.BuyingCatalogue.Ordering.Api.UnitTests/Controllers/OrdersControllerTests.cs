@@ -349,7 +349,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedOrder: new OrderModel
                 {
-                    OrderId = repositoryOrder.OrderId.ToString(),
+                    OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
                     Status = repositoryOrder.OrderStatus.Name,
                     DateCreated = repositoryOrder.Created,
