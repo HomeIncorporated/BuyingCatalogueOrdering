@@ -131,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             var descriptionResult = OrderDescription.Create(_orderDescription);
 
-            var order = Order.Create(descriptionResult.Value, _organisationId, _lastUpdatedBy, _lastUpdatedByName);
+            var order = Order.Create(descriptionResult.Value, _organisationId);
 
             order.OrderId = _orderId;
 
@@ -139,28 +139,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 _organisationName,
                 _organisationOdsCode,
                 _organisationAddress,
-                _organisationContact,
-                _lastUpdatedBy,
-                _lastUpdatedByName);
+                _organisationContact);
 
             order.ChangeSupplier(
                 _supplierId,
                 _supplierName,
                 _supplierAddress,
-                _supplierContact,
-                _lastUpdatedBy,
-                _lastUpdatedByName);
+                _supplierContact);
 
             if (_commencementDate.HasValue)
             {
-                order.ChangeCommencementDate(_commencementDate.Value, _lastUpdatedBy, _lastUpdatedByName);
+                order.ChangeCommencementDate(_commencementDate.Value);
             }
 
             order.ServiceRecipientsViewed = _serviceRecipientsViewed;
 
             if (_catalogueSolutionsViewed)
             {
-                order.MarkCatalogueSolutionsAsViewed(_lastUpdatedBy, _lastUpdatedByName);
+                order.MarkCatalogueSolutionsAsViewed();
             }
 
             return order;

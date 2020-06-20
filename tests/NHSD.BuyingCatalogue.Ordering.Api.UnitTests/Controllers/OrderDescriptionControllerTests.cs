@@ -212,7 +212,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await controller.UpdateAsync(orderId,
                     new OrderDescriptionModel { Description = newDescription.Value });
 
-            order.ChangeDescription(newDescription, context.UserId, context.Username);
+            order.ChangeDescription(newDescription);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(order), Times.Once);

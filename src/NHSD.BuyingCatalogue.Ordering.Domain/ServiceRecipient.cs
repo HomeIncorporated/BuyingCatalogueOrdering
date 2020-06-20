@@ -6,26 +6,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         public string OdsCode { get; }
 
-        public string OrderId { get; }
-
-        public Order Order { get; private set; }
-
         public string Name { get; }
 
-        public ServiceRecipient(string odsCode, string name)
+        public string OrderId { get; }
+
+        public Order Order { get; }
+
+        private ServiceRecipient()
+        {
+        }
+
+        private ServiceRecipient(
+            string odsCode, 
+            string name,
+            Order order) : this()
         {
             OdsCode = odsCode ?? throw new ArgumentNullException(nameof(odsCode));
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            Order = order ?? throw new ArgumentNullException(nameof(order));
         }
 
-        internal void SetOrder(Order order)
+        public static ServiceRecipient Create(
+            string odsCode,
+            string name,
+            Order order)
         {
-            Order = order ?? throw new ArgumentNullException(nameof(order));
+            return new ServiceRecipient(odsCode, name, order);
         }
 
         private bool Equals(ServiceRecipient other)
         {
-            return OdsCode == other.OdsCode && OrderId == other.OrderId;
+            return string.Equals(OdsCode, other.OdsCode, StringComparison.OrdinalIgnoreCase)
+                   && Equals(Order, other.Order);
         }
 
         public override bool Equals(object obj)
@@ -35,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(OdsCode, OrderId);
+            return HashCode.Combine(OdsCode, Order);
         }
     }
 }

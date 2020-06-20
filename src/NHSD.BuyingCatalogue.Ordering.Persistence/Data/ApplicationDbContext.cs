@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.EntityConfigurations;
 
@@ -8,15 +11,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
     public sealed class ApplicationDbContext : DbContext
     {
+        private readonly IIdentityService _identityService;
         private readonly ILoggerFactory _loggerFactory;
 
         public DbSet<Order> Order { get; set; }
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
+            IIdentityService identityService,
             ILoggerFactory loggerFactory) 
             : base(options)
         {
+            _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
@@ -24,7 +30,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         {
             base.OnConfiguring(optionsBuilder);
 
-            optionsBuilder?.UseLoggerFactory(_loggerFactory);
+            optionsBuilder?
+                .UseLoggerFactory(_loggerFactory)
+                .EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,6 +49,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OrderStatusEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ServiceRecipientEntityTypeConfiguration());
+        }
+
+        public override int SaveChanges()
+        {
+            BeforeSave();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            BeforeSave();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void BeforeSave()
+        {
+            foreach (var entity in ChangeTracker.Entries<Order>())
+            {
+                var now = DateTime.UtcNow;
+                var currentValues = entity.CurrentValues;
+
+                switch (entity.State)
+                {
+                    case EntityState.Added:
+                        currentValues[nameof(Domain.Order.Created)] = now;
+                        currentValues[nameof(Domain.Order.LastUpdated)] = now;
+                        currentValues[nameof(Domain.Order.LastUpdatedBy)] = _identityService.GetUserIdentity();
+                        currentValues[nameof(Domain.Order.LastUpdatedByName)] = _identityService.GetUserName();
+                        break;
+                    case EntityState.Modified:
+                        currentValues[nameof(Domain.Order.LastUpdated)] = now;
+                        currentValues[nameof(Domain.Order.LastUpdatedBy)] = _identityService.GetUserIdentity();
+                        currentValues[nameof(Domain.Order.LastUpdatedByName)] = _identityService.GetUserName();
+                        break;
+                }
+            }
         }
     }
 }

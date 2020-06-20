@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(order));
             }
 
-            _context.Order.Update(order);
+            //_context.Order.Update(order);
             await _context.SaveChangesAsync();
         }
 

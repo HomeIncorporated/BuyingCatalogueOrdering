@@ -98,9 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 model.Name, 
                 model.OdsCode, 
                 order.OrganisationAddress.FromModel(model.Address),
-                order.OrganisationContact.FromModel(model.PrimaryContact),
-                User.GetUserId(),
-                User.GetUserName());
+                order.OrganisationContact.FromModel(model.PrimaryContact));
 
             await _orderRepository.UpdateOrderAsync(order);
 

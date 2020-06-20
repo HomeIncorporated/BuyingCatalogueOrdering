@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
@@ -23,24 +22,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Created = DateTime.UtcNow;
         }
 
-        public static Order Create(
-            OrderDescription description, 
-            Guid organisationId, 
-            Guid lastUpdatedById, 
-            string lastUpdatedByName)
-        {
-            var order = new Order(description, organisationId);
-
-            order.ChangeLastUpdatedBy(lastUpdatedById, lastUpdatedByName);
-
-            return order;
-        }
+        public static Order Create(OrderDescription description, Guid organisationId) 
+            => new Order(description, organisationId);
 
         public string OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
 
-        public Guid OrganisationId { get; private set; }
+        public Guid OrganisationId { get; }
 
         public string OrganisationName { get; private set; }
 
@@ -56,11 +45,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; }
 
-        public DateTime LastUpdated { get; private set; }
+        public DateTime LastUpdated { get; }
 
-        public Guid LastUpdatedBy { get; private set; }
+        public Guid LastUpdatedBy { get; }
 
-        public string LastUpdatedByName { get; private set; }
+        public string LastUpdatedByName { get; }
 
         public OrderStatus OrderStatus { get; }
 
@@ -68,100 +57,106 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool CatalogueSolutionsViewed { get; private set; }
 
-        public string SupplierId { get; private set; } 
+        public string SupplierId { get; private set; }
 
         public string SupplierName { get; private set; }
 
         public int? SupplierAddressId { get; }
 
         public Address SupplierAddress { get; private set; }
-        
+
         public int? SupplierContactId { get; }
 
         public Contact SupplierContact { get; private set; }
 
         public DateTime? CommencementDate { get; private set; }
 
-        public IReadOnlyCollection<ServiceRecipient> ServiceRecipients 
+        public IReadOnlyCollection<ServiceRecipient> ServiceRecipients
             => _serviceRecipients.AsReadOnly();
 
-        public void ChangeDescription(OrderDescription orderDescription, Guid userId, string name)
+        public void ChangeDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
-            ChangeLastUpdatedBy(userId, name);
         }
 
         public void ChangeOrderParty(
-            string orderingPartyName, 
-            string orderingPartyOdsCode, 
+            string orderingPartyName,
+            string orderingPartyOdsCode,
             Address orderPartyAddress,
-            Contact orderingPartyContact, 
-            Guid userId, 
-            string name)
+            Contact orderingPartyContact)
         {
             OrganisationName = orderingPartyName;
             OrganisationOdsCode = orderingPartyOdsCode;
             OrganisationAddress = orderPartyAddress;
             OrganisationContact = orderingPartyContact;
-
-            ChangeLastUpdatedBy(userId, name);
         }
 
         public void ChangeSupplier(
-            string supplierId, 
-            string supplierName, 
-            Address supplierAddress, 
-            Contact supplierContact, 
-            Guid userId, 
-            string name)
+            string supplierId,
+            string supplierName,
+            Address supplierAddress,
+            Contact supplierContact)
         {
             SupplierId = supplierId;
             SupplierName = supplierName;
             SupplierAddress = supplierAddress;
             SupplierContact = supplierContact;
-
-            ChangeLastUpdatedBy(userId, name);
         }
 
-        public void MarkCatalogueSolutionsAsViewed(Guid userId, string name)
+        private void MarkServiceRecipientsAsViewed()
+        {
+            if (ServiceRecipientsViewed)
+                return;
+
+            ServiceRecipientsViewed = true;
+        }
+
+        public void MarkCatalogueSolutionsAsViewed()
         {
             if (CatalogueSolutionsViewed)
                 return;
 
             CatalogueSolutionsViewed = true;
-            ChangeLastUpdatedBy(userId, name);
         }
 
-        private void ChangeLastUpdatedBy(Guid userId, string name)
-        {
-            LastUpdatedBy = userId;
-            LastUpdatedByName = name ?? throw new ArgumentNullException(nameof(name));
-            LastUpdated = DateTime.UtcNow;
-        }
-
-        public void ChangeCommencementDate(DateTime commencementDate, Guid userId, string name)
+        public void ChangeCommencementDate(DateTime commencementDate)
         {
             if (CommencementDate.GetValueOrDefault().Date.Equals(commencementDate.Date))
                 return;
 
             CommencementDate = commencementDate;
-            ChangeLastUpdatedBy(userId, name);
         }
 
-        public void ChangeServiceRecipients(IList<ServiceRecipient> serviceRecipients, Guid userId, string name)
+        public void ChangeServiceRecipients(IList<(string odsCode, string name)> serviceRecipients)
         {
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));
 
-            foreach (var serviceRecipient in serviceRecipients)
+            _serviceRecipients.Clear();
+
+            foreach ((string odsCode, string name) in serviceRecipients)
             {
-                serviceRecipient.SetOrder(this);
+                _serviceRecipients.Add(ServiceRecipient.Create(odsCode, name, this));
             }
 
-            _serviceRecipients.Clear();
-            _serviceRecipients.AddRange(serviceRecipients);
+            MarkServiceRecipientsAsViewed();
 
-            ChangeLastUpdatedBy(userId, name);
+            CatalogueSolutionsViewed = (!_serviceRecipients.Any());
+        }
+
+        private bool Equals(Order other)
+        {
+            return OrderId == other.OrderId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is Order other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(OrderId);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.ChangeDescription(OrderDescription.Create(expectedDescription).Value, Guid.NewGuid(), "Some user name");
+            context.Order.ChangeDescription(OrderDescription.Create(expectedDescription).Value);
             var result = await context.Controller.GetAllAsync("myOrder");
             result.Value.Should().BeOfType<CatalogueSolutionsModel>();
             var model = result.Value;

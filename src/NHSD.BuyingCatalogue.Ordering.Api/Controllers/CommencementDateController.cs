@@ -68,7 +68,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 throw new ArgumentException(nameof(model.CommencementDate));
             }
 
-            order.ChangeCommencementDate(model.CommencementDate.Value, User.GetUserId(), User.GetUserName());
+            order.ChangeCommencementDate(model.CommencementDate.Value);
 
             await _orderRepository.UpdateOrderAsync(order);
 

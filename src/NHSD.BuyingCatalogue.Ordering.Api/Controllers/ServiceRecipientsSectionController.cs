@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -30,14 +28,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
             if (order is null)
             {
                 return NotFound();
             }
 
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
-
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
@@ -75,9 +71,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var serviceRecipients = model.ServiceRecipients
-                .Select(x => new ServiceRecipient(x.OdsCode, x.Name)).ToList();
+                .Select(x => (x.OdsCode, x.Name)).ToList();
 
-            order.ChangeServiceRecipients(serviceRecipients, User.GetUserId(), User.GetUserName());
+            order.ChangeServiceRecipients(serviceRecipients);
 
             await _orderRepository.UpdateOrderAsync(order);
 

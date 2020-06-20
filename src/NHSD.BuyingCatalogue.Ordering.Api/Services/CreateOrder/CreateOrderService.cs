@@ -34,9 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 
             var order = Order.Create(
                 descriptionResult.Value,
-                orderOrganisationIdResult.Value,
-                createOrderRequest.LastUpdatedById,
-                createOrderRequest.LastUpdatedByName);
+                orderOrganisationIdResult.Value);
 
             var orderId = await _orderRepository.CreateOrderAsync(order);
             return Result.Success(orderId);

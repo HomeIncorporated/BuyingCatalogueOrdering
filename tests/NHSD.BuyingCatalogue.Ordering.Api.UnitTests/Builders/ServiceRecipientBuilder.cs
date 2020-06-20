@@ -28,14 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal ServiceRecipient Build()
-        {
-            var serviceRecipient = new ServiceRecipient(_odsCode, _name);
-
-            serviceRecipient.SetOrder(OrderBuilder.Create().WithOrderId(_orderId).Build());
-
-            return serviceRecipient;
-        }
-
+        internal ServiceRecipient Build() 
+            => ServiceRecipient.Create(_odsCode, _name, OrderBuilder.Create().WithOrderId(_orderId).Build());
     }
 }

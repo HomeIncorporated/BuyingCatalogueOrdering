@@ -331,7 +331,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
                     Status = repositoryOrder.OrderStatus.Name,
-                    DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
                     LastUpdatedBy = repositoryOrder.LastUpdatedByName
                 });

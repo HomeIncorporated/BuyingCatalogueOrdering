@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
             }
 
-            order.ChangeDescription(isValid.Value, User.GetUserId(), User.GetUserName());
+            order.ChangeDescription(isValid.Value);
 
             await _orderRepository.UpdateOrderAsync(order);
 

@@ -75,9 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 model.SupplierId,
                 model.Name,
                 order.SupplierAddress.FromModel(model.Address),
-                order.SupplierContact.FromModel(model.PrimaryContact),
-                User.GetUserId(),
-                User.GetUserName());
+                order.SupplierContact.FromModel(model.PrimaryContact));
 
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();
