@@ -14,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         private readonly IIdentityService _identityService;
         private readonly ILoggerFactory _loggerFactory;
 
-        public DbSet<Order> Order { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
@@ -67,19 +67,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         {
             foreach (var entity in ChangeTracker.Entries<Order>())
             {
-                var now = DateTime.UtcNow;
                 var currentValues = entity.CurrentValues;
 
                 switch (entity.State)
                 {
                     case EntityState.Added:
-                        currentValues[nameof(Domain.Order.Created)] = now;
-                        currentValues[nameof(Domain.Order.LastUpdated)] = now;
-                        currentValues[nameof(Domain.Order.LastUpdatedBy)] = _identityService.GetUserIdentity();
-                        currentValues[nameof(Domain.Order.LastUpdatedByName)] = _identityService.GetUserName();
-                        break;
                     case EntityState.Modified:
-                        currentValues[nameof(Domain.Order.LastUpdated)] = now;
                         currentValues[nameof(Domain.Order.LastUpdatedBy)] = _identityService.GetUserIdentity();
                         currentValues[nameof(Domain.Order.LastUpdatedByName)] = _identityService.GetUserName();
                         break;

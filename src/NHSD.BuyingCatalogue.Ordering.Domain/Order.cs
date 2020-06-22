@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; }
 
-        public DateTime LastUpdated { get; }
+        public DateTime LastUpdated { get; private set; }
 
         public Guid LastUpdatedBy { get; }
 
@@ -77,6 +77,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public void ChangeDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
+
+            ChangeLastUpdated();
         }
 
         public void ChangeOrderParty(
@@ -89,6 +91,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             OrganisationOdsCode = orderingPartyOdsCode;
             OrganisationAddress = orderPartyAddress;
             OrganisationContact = orderingPartyContact;
+
+            ChangeLastUpdated();
         }
 
         public void ChangeSupplier(
@@ -101,6 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             SupplierName = supplierName;
             SupplierAddress = supplierAddress;
             SupplierContact = supplierContact;
+
+            ChangeLastUpdated();
         }
 
         private void MarkServiceRecipientsAsViewed()
@@ -109,6 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return;
 
             ServiceRecipientsViewed = true;
+            ChangeLastUpdated();
         }
 
         public void MarkCatalogueSolutionsAsViewed()
@@ -117,6 +124,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return;
 
             CatalogueSolutionsViewed = true;
+            ChangeLastUpdated();
+        }
+
+        private void MarkCatalogueSolutionsAsUnviewed()
+        {
+            if (!CatalogueSolutionsViewed)
+                return;
+
+            CatalogueSolutionsViewed = false;
+            ChangeLastUpdated();
         }
 
         public void ChangeCommencementDate(DateTime commencementDate)
@@ -125,6 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return;
 
             CommencementDate = commencementDate;
+            ChangeLastUpdated();
         }
 
         public void ChangeServiceRecipients(IList<(string odsCode, string name)> serviceRecipients)
@@ -141,7 +159,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             MarkServiceRecipientsAsViewed();
 
-            CatalogueSolutionsViewed = (!_serviceRecipients.Any());
+            if (!_serviceRecipients.Any())
+                MarkCatalogueSolutionsAsUnviewed();
+
+            ChangeLastUpdated();
+        }
+
+        private void ChangeLastUpdated()
+        {
+            LastUpdated = DateTime.UtcNow;
         }
 
         private bool Equals(Order other)

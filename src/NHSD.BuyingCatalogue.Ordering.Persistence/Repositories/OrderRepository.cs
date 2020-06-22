@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId)
         {
-            return await _context.Order
+            return await _context.Orders
                 .Include(x => x.OrganisationAddress)
                 .Include(x => x.OrganisationContact)
                 .Include(x => x.SupplierAddress)
@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
         	if (string.IsNullOrWhiteSpace(orderId))
             	return null;
         	
-            var order = await _context.Order.FindAsync(orderId);
+            var order = await _context.Orders.FindAsync(orderId);
             if (order != null)
             {
                 await _context.Entry(order).Reference(x => x.OrganisationAddress).LoadAsync();
@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(order));
             }
 
-            //_context.Order.Update(order);
+            //_context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
 
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                     order.OrderId = await GetIncrementedOrderId();
                 }
 
-                _context.Order.Add(order);
+                _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
                 await dbContextTransaction.CommitAsync();
             }
@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         private async Task<string> GetLatestOrderIdByCreationDateAsync()
         {
-            var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+            var latestOrder = await _context.Orders.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
             return latestOrder?.OrderId;
         }
     }
